@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>SIDDHI AI | Elite Web Development</title>
     
+    <!-- Neon Golden 'AI' Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cfilter id='glow' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='5' result='blur'/%3E%3CfeMerge%3E%3CfeMergeNode in='blur'/%3E%3CfeMergeNode in='blur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect width='100' height='100' fill='%23020203' rx='22'/%3E%3Ctext x='48' y='68' font-family='sans-serif' font-size='56' font-style='italic' font-weight='normal' fill='%23E5B769' text-anchor='middle' filter='url(%23glow)'%3EAI%3C/text%3E%3Ctext x='48' y='68' font-family='sans-serif' font-size='56' font-style='italic' font-weight='normal' fill='%23FFF8DC' text-anchor='middle'%3EAI%3C/text%3E%3C/svg%3E">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -181,7 +184,6 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            /* Transition smoothed by JS */
         }
     </style>
 
@@ -311,7 +313,9 @@
 
         <!-- 1ST SECTION: 3D INTERACTIVE TEXT (SIDDHI AI) -->
         <section id="hero-text-3d" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden interactive-ui border-b border-textmain/10 bg-transparent">
+            <!-- Dedicated canvas container for the 3D Text -->
             <div id="text-canvas-container" class="absolute inset-0 cursor-ew-resize"></div>
+            
             <div class="absolute bottom-16 left-1/2 -translate-x-1/2 text-center pointer-events-none w-full px-6 z-10">
                 <h2 class="text-3xl md:text-4xl font-light text-textmain tracking-[0.4em] uppercase drop-shadow-2xl">
                     Grow Your <span class="text-accent font-bold">Business</span>
@@ -469,6 +473,7 @@
                 
                 <div class="relative w-full h-[500px] md:h-[600px] rounded-[2rem] overflow-hidden glass-panel border-accent/20 shadow-[0_0_50px_rgba(var(--accent-rgb),0.05)] gsap-card">
                     
+                    <!-- Reset Button -->
                     <button id="reset-decals" class="absolute top-6 right-6 z-20 px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/50 rounded-lg text-[9px] uppercase tracking-widest font-bold hover:bg-red-500 hover:text-white transition-colors pointer-events-auto shadow-lg backdrop-blur-md">
                         <i data-lucide="trash-2" class="w-3 h-3 inline mr-1 -mt-0.5"></i> Reset Imprints
                     </button>
@@ -877,12 +882,12 @@
 
         for (let i = 0; i < 66; i++) {
             const base = baseLocs[i % baseLocs.length];
-            const latOffset = (Math.random() - 0.5) * 15;
-            const lonOffset = (Math.random() - 0.5) * 15;
+            const latOffset = (Math.random() - 0.5) * 10;
+            const lonOffset = (Math.random() - 0.5) * 10;
             
             const nodeData = {
                 name: base.name,
-                client: base.client + (i >= baseLocs.length ? ` ${i}` : ''),
+                client: base.client + (i > baseLocs.length ? ` ${i}` : ''),
                 review: base.review,
                 lat: base.lat + latOffset,
                 lon: base.lon + lonOffset
@@ -1152,7 +1157,7 @@
         }, 500);
 
         /* ==========================================
-           7. GOOGLE SHEETS FORM ENGINE (EXPLICIT DATA)
+           7. GOOGLE SHEETS FORM ENGINE (EXPLICIT MAPPING)
         ========================================== */
         const scriptURL = 'https://script.google.com/macros/s/AKfycbwuwVFdFZGM9C9IIFo4siP2VlMffCRtN9OIC3IC1U0UlWWDYycem07CnVEfLYFdnB8qdA/exec';
         const form = document.getElementById('leadForm');
@@ -1161,9 +1166,9 @@
             const btn = document.getElementById('submitBtn'), txt = document.getElementById('btnText'), ico = document.getElementById('btnIcon'), status = document.getElementById('formStatus');
             btn.disabled = true; txt.innerText = "Sending..."; ico.setAttribute('data-lucide', 'loader-2'); ico.classList.add('animate-spin'); lucide.createIcons(); status.classList.add('hidden');
             
-            // EXPLICITLY map the required URLSearchParams for Apps Script (Date, Name, Contact, Service, Message)
+            // EXPLICIT PAYLOAD MAPPING FOR APPS SCRIPT
             const payload = new URLSearchParams();
-            payload.append("Date", new Date().toISOString());
+            payload.append("Date", new Date().toLocaleString());
             payload.append("Name", form.Name.value);
             payload.append("Contact", form.Contact.value);
             payload.append("Service", form.Service.value);
@@ -1172,7 +1177,7 @@
             fetch(scriptURL, { method: 'POST', body: payload, mode: 'no-cors' })
             .then(() => {
                 txt.innerText = "Message Sent"; status.innerText = "Successfully logged in Google Sheets."; status.className = "mb-8 p-4 rounded-lg text-[10px] uppercase tracking-widest font-bold text-center border border-green-500/30 text-green-400 bg-green-500/10 block"; form.reset();
-                setTimeout(() => { btn.disabled = false; txt.innerText = "Send Message"; ico.setAttribute('data-lucide', 'send'); ico.classList.remove('animate-spin'); lucide.createIcons(); }, 3000);
+                setTimeout(() => { btn.disabled = false; txt.innerText = "Transmit Data"; ico.setAttribute('data-lucide', 'send'); ico.classList.remove('animate-spin'); lucide.createIcons(); }, 3000);
             })
             .catch(error => {
                 status.innerText = "Network Error Occurred."; status.className = "mb-8 p-4 rounded-lg text-[10px] uppercase tracking-widest font-bold text-center border border-red-500/30 text-red-400 bg-red-500/10 block";
