@@ -627,27 +627,31 @@
             <div class="marquee-container pr-10"><div class="marquee-track reverse" id="testimonial-track-2"></div></div>
         </section>
 
-        <!-- Form Section -->
+        <!-- Form Section with Web3Forms integration -->
         <section id="contact" class="py-32 relative interactive-ui border-t border-textmain/10 bg-transparent">
             <div class="max-w-3xl mx-auto px-6">
                 <div class="text-center mb-12 gsap-reveal">
                     <h2 class="font-serif text-4xl text-textmain mb-4">Start Your <span class="gold-gradient italic">Project.</span></h2>
-                    <p class="text-textmuted font-light text-sm">Fast response guaranteed. Information securely sent via Google Sheets integration.</p>
+                    <p class="text-textmuted font-light text-sm">Fast response guaranteed. Information securely sent via Web3Forms.</p>
                 </div>
                 <form id="leadForm" class="gsap-form glass-panel p-8 md:p-14 rounded-[2rem] relative">
+                    <!-- Web3Forms Access Key -->
+                    <input type="hidden" name="access_key" value="cc00315a-4788-4605-9473-d4a293f057a2">
+                    <!-- Optional: redirect after submission (leave empty to stay on page) -->
+                    <input type="hidden" name="redirect" value="">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-8">
                         <div class="group">
                             <label class="block text-[10px] font-black text-textmuted uppercase tracking-widest mb-2 group-focus-within:text-accent transition-colors">Business Name *</label>
-                            <input type="text" name="Name" required class="w-full bg-transparent border-b border-textmain/20 pb-3 text-textmain text-base focus:outline-none focus:border-accent transition-colors">
+                            <input type="text" name="name" required class="w-full bg-transparent border-b border-textmain/20 pb-3 text-textmain text-base focus:outline-none focus:border-accent transition-colors">
                         </div>
                         <div class="group">
                             <label class="block text-[10px] font-black text-textmuted uppercase tracking-widest mb-2 group-focus-within:text-accent transition-colors">Email / Phone *</label>
-                            <input type="text" name="Contact" required class="w-full bg-transparent border-b border-textmain/20 pb-3 text-textmain text-base focus:outline-none focus:border-accent transition-colors">
+                            <input type="text" name="email" required class="w-full bg-transparent border-b border-textmain/20 pb-3 text-textmain text-base focus:outline-none focus:border-accent transition-colors">
                         </div>
                     </div>
                     <div class="mb-10 group">
                         <label class="block text-[10px] font-black text-textmuted uppercase tracking-widest mb-2 group-focus-within:text-accent transition-colors">Package Interest</label>
-                        <select name="Service" class="w-full bg-transparent border-b border-textmain/20 pb-3 text-textmain text-base focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer">
+                        <select name="service" class="w-full bg-transparent border-b border-textmain/20 pb-3 text-textmain text-base focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer">
                             <option value="Static Website" class="bg-obsidian">Static Website (₹8,999)</option>
                             <option value="Dynamic Website" class="bg-obsidian">Dynamic Website (From ₹15,999)</option>
                             <option value="3D Immersive" class="bg-obsidian">3D / Interactive Experience</option>
@@ -655,7 +659,7 @@
                     </div>
                     <div class="mb-12 group">
                         <label class="block text-[10px] font-black text-textmuted uppercase tracking-widest mb-2 group-focus-within:text-accent transition-colors">Project Details</label>
-                        <textarea name="Message" rows="2" class="w-full bg-transparent border-b border-textmain/20 pb-3 text-textmain text-base focus:outline-none focus:border-accent transition-colors resize-none"></textarea>
+                        <textarea name="message" rows="2" class="w-full bg-transparent border-b border-textmain/20 pb-3 text-textmain text-base focus:outline-none focus:border-accent transition-colors resize-none"></textarea>
                     </div>
                     <div id="formStatus" class="hidden mb-8 p-4 rounded-lg text-[10px] uppercase tracking-widest font-bold text-center border"></div>
                     <button type="submit" id="submitBtn" class="w-full bg-textmain hover:bg-accent text-obsidian font-black py-5 rounded-full text-[11px] uppercase tracking-[0.25em] transition-all flex items-center justify-center gap-3 shadow-lg btn-creepy">
@@ -1451,31 +1455,56 @@
         }, 500);
 
         /* ==========================================
-           7. GOOGLE SHEETS FORM ENGINE
+           7. WEB3FORMS FORM SUBMISSION (replaces Google Sheets)
         ========================================== */
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwuwVFdFZGM9C9IIFo4siP2VlMffCRtN9OIC3IC1U0UlWWDYycem07CnVEfLYFdnB8qdA/exec';
         const form = document.getElementById('leadForm');
-        form.addEventListener('submit', e => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn'), txt = document.getElementById('btnText'), ico = document.getElementById('btnIcon'), status = document.getElementById('formStatus');
-            btn.disabled = true; txt.innerText = "Sending..."; ico.setAttribute('data-lucide', 'loader-2'); ico.classList.add('animate-spin'); lucide.createIcons(); status.classList.add('hidden');
+            const btn = document.getElementById('submitBtn');
+            const txt = document.getElementById('btnText');
+            const ico = document.getElementById('btnIcon');
+            const status = document.getElementById('formStatus');
             
-            const payload = new URLSearchParams();
-            payload.append("Date", new Date().toLocaleString());
-            payload.append("Name", form.Name.value);
-            payload.append("Contact", form.Contact.value);
-            payload.append("Service", form.Service.value);
-            payload.append("Message", form.Message.value);
+            btn.disabled = true;
+            txt.innerText = "Sending...";
+            ico.setAttribute('data-lucide', 'loader-2');
+            ico.classList.add('animate-spin');
+            lucide.createIcons();
+            status.classList.add('hidden');
 
-            fetch(scriptURL, { method: 'POST', body: payload, mode: 'no-cors' })
-            .then(() => {
-                txt.innerText = "Message Sent"; status.innerText = "Successfully logged in Google Sheets."; status.className = "mb-8 p-4 rounded-lg text-[10px] uppercase tracking-widest font-bold text-center border border-green-500/30 text-green-400 bg-green-500/10 block"; form.reset();
-                setTimeout(() => { btn.disabled = false; txt.innerText = "Transmit Data"; ico.setAttribute('data-lucide', 'send'); ico.classList.remove('animate-spin'); lucide.createIcons(); }, 3000);
-            })
-            .catch(error => {
-                status.innerText = "Network Error Occurred."; status.className = "mb-8 p-4 rounded-lg text-[10px] uppercase tracking-widest font-bold text-center border border-red-500/30 text-red-400 bg-red-500/10 block";
-                btn.disabled = false; txt.innerText = "Retry Transmission"; ico.setAttribute('data-lucide', 'refresh-ccw'); ico.classList.remove('animate-spin'); lucide.createIcons();
-            });
+            // Prepare form data
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    txt.innerText = "Message Sent";
+                    status.innerText = "Thank you! We'll get back to you soon.";
+                    status.className = "mb-8 p-4 rounded-lg text-[10px] uppercase tracking-widest font-bold text-center border border-green-500/30 text-green-400 bg-green-500/10 block";
+                    form.reset();
+                } else {
+                    throw new Error(result.message || 'Submission failed');
+                }
+            } catch (error) {
+                status.innerText = "Network Error Occurred.";
+                status.className = "mb-8 p-4 rounded-lg text-[10px] uppercase tracking-widest font-bold text-center border border-red-500/30 text-red-400 bg-red-500/10 block";
+            } finally {
+                btn.disabled = false;
+                txt.innerText = "Transmit Data";
+                ico.setAttribute('data-lucide', 'send');
+                ico.classList.remove('animate-spin');
+                lucide.createIcons();
+            }
         });
     </script>
 </body>
