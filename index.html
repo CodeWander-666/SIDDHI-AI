@@ -431,7 +431,7 @@
             <a href="#contact" class="mobile-start-btn" onclick="document.getElementById('mobileMenuOverlay').classList.remove('open');">Start Project</a>
         </div>
 
-        <!-- 1ST SECTION: 3D INTERACTIVE TEXT with Liquid Metallic Shine, Smaller Size -->
+        <!-- 1ST SECTION: 3D INTERACTIVE TEXT with Liquid Metallic Shine, Smaller Size, Auto-Rotate on Mobile -->
         <section id="hero-text-3d" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden interactive-ui border-b border-textmain/10 bg-transparent">
             <!-- Dedicated canvas container for the 3D Text -->
             <div id="text-canvas-container" class="absolute inset-0" style="touch-action: none;"></div>
@@ -667,9 +667,41 @@
             <p class="text-textmain tracking-widest uppercase mt-6 font-bold text-sm bg-obsidian/40 px-6 py-2 rounded-full backdrop-blur-sm border border-textmain/10 shadow-xl">Enjoy the view.</p>
         </section>
 
+        <!-- FOOTER SECTION with social icons, verification badges, and legal links -->
         <footer class="py-12 border-t border-textmain/10 bg-obsidian interactive-ui">
             <div class="max-w-7xl mx-auto px-6 text-center">
-                <span class="font-extrabold text-2xl tracking-tighter text-textmain mb-4 block drop-shadow-lg">SIDDHI <span class="text-accent">AI</span></span>
+                <span class="font-extrabold text-2xl tracking-tighter text-textmain mb-6 block drop-shadow-lg">SIDDHI <span class="text-accent">AI</span></span>
+                
+                <!-- Social & Verification Icons Row -->
+                <div class="flex flex-wrap items-center justify-center gap-6 mb-8">
+                    <!-- GitHub -->
+                    <a href="https://github.com/CodeWander-666-github" target="_blank" rel="noopener noreferrer" class="text-textmuted hover:text-accent transition-colors">
+                        <i data-lucide="github" class="w-6 h-6"></i>
+                    </a>
+                    <!-- Google icon (using 'chrome' as a generic Google icon) -->
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="text-textmuted hover:text-accent transition-colors">
+                        <i data-lucide="chrome" class="w-6 h-6"></i>
+                    </a>
+                    <!-- GST Verified -->
+                    <div class="flex items-center gap-1 text-textmuted">
+                        <i data-lucide="badge-check" class="w-5 h-5 text-accent"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-wider">GST</span>
+                    </div>
+                    <!-- Udyam Verified -->
+                    <div class="flex items-center gap-1 text-textmuted">
+                        <i data-lucide="badge-check" class="w-5 h-5 text-accent"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Udyam</span>
+                    </div>
+                </div>
+
+                <!-- Legal Links -->
+                <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-[9px] text-textmuted uppercase tracking-[0.2em] font-bold">
+                    <a href="#" class="hover:text-accent transition-colors">Terms & Conditions</a>
+                    <span class="text-textmain/20">|</span>
+                    <a href="#" class="hover:text-accent transition-colors">Privacy Policy</a>
+                </div>
+
+                <!-- Copyright -->
                 <p class="text-[9px] text-textmuted uppercase tracking-[0.3em] font-bold drop-shadow-md">&copy; 2017-2026. Business Web Solutions.</p>
             </div>
         </footer>
@@ -754,7 +786,7 @@
         });
 
         /* ==========================================
-           0. 1ST SECTION: 3D INTERACTIVE TEXT with Liquid Metallic Shine, Smaller Size
+           0. 1ST SECTION: 3D INTERACTIVE TEXT with Liquid Metallic Shine, Smaller Size, Auto-Rotate on Mobile
         ========================================== */
         const textCont = document.getElementById('text-canvas-container');
         const rendererText = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -763,9 +795,8 @@
         textCont.appendChild(rendererText.domElement);
 
         const cameraText = new THREE.PerspectiveCamera(45, textCont.clientWidth / textCont.clientHeight, 1, 1500);
-        // Adjust camera to make text appear smaller than "Grow Your Business" line
         if (isMobile) {
-            cameraText.position.set(0, -20, 250); // y offset to center two lines
+            cameraText.position.set(0, -20, 250);
         } else {
             cameraText.position.set(0, -40, 450);
         }
@@ -773,11 +804,9 @@
 
         const sceneText = new THREE.Scene();
         
-        // Add environment map for reflections (ultra HDR shine)
         const pmremGenerator = new THREE.PMREMGenerator(rendererText);
         const envMap = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
         
-        // Lights
         const ambientLightText = new THREE.AmbientLight(0x404060);
         sceneText.add(ambientLightText);
         const dirLight1T = new THREE.DirectionalLight(0xffeedd, 1.5);
@@ -786,7 +815,6 @@
         const dirLight2T = new THREE.DirectionalLight(0x99ccff, 1.2);
         dirLight2T.position.set(-1, 0.5, -1);
         sceneText.add(dirLight2T);
-        // Add point lights for extra shine
         const pointLight1 = new THREE.PointLight(0xffaa00, 1, 20);
         pointLight1.position.set(2, 2, 5);
         sceneText.add(pointLight1);
@@ -794,12 +822,10 @@
         pointLight2.position.set(-2, -1, 5);
         sceneText.add(pointLight2);
 
-        // Create metallic shiny texture using canvas
         const canvas = document.createElement('canvas');
         canvas.width = 512;
         canvas.height = 512;
         const ctx = canvas.getContext('2d');
-        // Radial gradient for liquid metal effect
         const gradient = ctx.createRadialGradient(256, 256, 0, 256, 256, 256);
         gradient.addColorStop(0, '#ffffff');
         gradient.addColorStop(0.2, '#ffdd99');
@@ -809,20 +835,18 @@
         gradient.addColorStop(1, '#442200');
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, 512, 512);
-        // Add noise for liquid effect
         for (let i = 0; i < 5000; i++) {
             ctx.fillStyle = `rgba(255,255,255,${Math.random()*0.3})`;
             ctx.fillRect(Math.random()*512, Math.random()*512, 2, 2);
         }
         const metalTexture = new THREE.CanvasTexture(canvas);
         metalTexture.wrapS = metalTexture.wrapT = THREE.RepeatWrapping;
-        metalTexture.repeat.set(2, 2); // scale pattern
+        metalTexture.repeat.set(2, 2);
 
-        // Material with metallic shine
         const material = new THREE.MeshPhongMaterial({
             color: 0xffffff,
             map: metalTexture,
-            emissive: 0x222222, // subtle glow
+            emissive: 0x222222,
             emissiveIntensity: 0.3,
             shininess: 100,
             specular: 0x444444,
@@ -834,11 +858,9 @@
         const groupText = new THREE.Group();
         sceneText.add(groupText);
 
-        // Load font and create two lines of text with bevel (3D curved edges)
         const fontLoader = new FontLoader();
         fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
-            // First line: SIDDHI AI (larger)
-            const size1 = isMobile ? 18 : 24; // smaller than Grow Your Business (30/36)
+            const size1 = isMobile ? 18 : 24;
             const geometry1 = new TextGeometry('SIDDHI AI', {
                 font: font,
                 size: size1,
@@ -851,14 +873,12 @@
                 bevelSegments: 5
             });
             geometry1.computeBoundingBox();
-            const width1 = geometry1.boundingBox.max.x - geometry1.boundingBox.min.x;
-            geometry1.center(); // center horizontally
+            geometry1.center();
 
             const mesh1 = new THREE.Mesh(geometry1, material);
-            mesh1.position.y = size1 * 0.6; // lift slightly
+            mesh1.position.y = size1 * 0.6;
             groupText.add(mesh1);
 
-            // Second line: AI POWERED WEB DEVELOPMENT (smaller)
             const size2 = isMobile ? 12 : 16;
             const geometry2 = new TextGeometry('AI POWERED WEB DEVELOPMENT', {
                 font: font,
@@ -875,10 +895,9 @@
             geometry2.center();
 
             const mesh2 = new THREE.Mesh(geometry2, material);
-            mesh2.position.y = -size2 * 0.8; // below first line
+            mesh2.position.y = -size2 * 0.8;
             groupText.add(mesh2);
 
-            // Add outline lines for extra shine (optional)
             const edges1 = new THREE.EdgesGeometry(geometry1);
             const line1 = new THREE.LineSegments(edges1, new THREE.LineBasicMaterial({ color: 0xffaa44 }));
             line1.position.copy(mesh1.position);
@@ -890,48 +909,53 @@
             groupText.add(line2);
         });
 
-        // Rotation logic – only for this canvas
+        // Rotation logic – only enable drag on non-mobile
         let textTargetRotation = 0, textTargetRotationOnPointerDown = 0;
         let textPointerX = 0, textPointerXOnPointerDown = 0;
         let windowHalfX = window.innerWidth / 2;
         let isDragging = false;
         let dragStartY = 0;
 
-        textCont.style.touchAction = 'none';
-        textCont.addEventListener('pointerdown', (e) => {
-            if (e.isPrimary === false) return;
-            isDragging = true;
-            dragStartY = e.clientY;
-            textPointerXOnPointerDown = e.clientX - windowHalfX;
-            textTargetRotationOnPointerDown = textTargetRotation;
-        });
+        if (!isMobile) {
+            textCont.style.touchAction = 'none';
+            textCont.addEventListener('pointerdown', (e) => {
+                if (e.isPrimary === false) return;
+                isDragging = true;
+                dragStartY = e.clientY;
+                textPointerXOnPointerDown = e.clientX - windowHalfX;
+                textTargetRotationOnPointerDown = textTargetRotation;
+            });
 
-        document.addEventListener('pointermove', (e) => {
-            if (!isDragging || e.isPrimary === false) return;
-            const deltaX = e.clientX - (textPointerXOnPointerDown + windowHalfX);
-            const deltaY = e.clientY - dragStartY;
-            
-            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 5) {
-                e.preventDefault();
-                textPointerX = e.clientX - windowHalfX;
-                textTargetRotation = textTargetRotationOnPointerDown + (textPointerX - textPointerXOnPointerDown) * 0.02;
-            }
-        });
+            document.addEventListener('pointermove', (e) => {
+                if (!isDragging || e.isPrimary === false) return;
+                const deltaX = e.clientX - (textPointerXOnPointerDown + windowHalfX);
+                const deltaY = e.clientY - dragStartY;
+                
+                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 5) {
+                    e.preventDefault();
+                    textPointerX = e.clientX - windowHalfX;
+                    textTargetRotation = textTargetRotationOnPointerDown + (textPointerX - textPointerXOnPointerDown) * 0.02;
+                }
+            });
 
-        document.addEventListener('pointerup', (e) => {
-            if (e.isPrimary === false) return;
-            isDragging = false;
-        });
+            document.addEventListener('pointerup', (e) => {
+                if (e.isPrimary === false) return;
+                isDragging = false;
+            });
+        }
 
         function updateTextScene(time) {
-            groupText.rotation.y += (textTargetRotation - groupText.rotation.y) * 0.05;
+            if (isMobile) {
+                groupText.rotation.y += 0.005; // auto-rotate
+            } else {
+                groupText.rotation.y += (textTargetRotation - groupText.rotation.y) * 0.05;
+            }
             cameraText.lookAt(cameraTargetText);
             rendererText.render(sceneText, cameraText);
         }
 
         /* ==========================================
-           1. MAIN BACKGROUND ENVIRONMENT (optimized for mobile)
-           (unchanged from previous version)
+           1. MAIN BACKGROUND ENVIRONMENT (unchanged)
         ========================================== */
         const canvasBg = document.getElementById('webgl-canvas');
         const rendererBg = new THREE.WebGLRenderer({ canvas: canvasBg, antialias: true, alpha: true });
