@@ -5,6 +5,10 @@ on:
     - cron: '0 6 * * *'   # Runs daily at 06:00 UTC
   workflow_dispatch:       # Manual trigger
 
+# Grant write permission for pushing changes
+permissions:
+  contents: write
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Opt into Node24 early
 
@@ -15,6 +19,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # Explicitly use the token
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -32,6 +38,8 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          # Set remote URL with token authentication
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git add blog/
           git diff --quiet && git diff --staged --quiet || git commit -m "Add daily blog post [skip ci]"
           git push
