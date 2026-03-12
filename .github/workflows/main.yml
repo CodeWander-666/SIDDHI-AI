@@ -2,49 +2,36 @@ name: Daily Blog Post Generator
 
 on:
   schedule:
-    # Run every day at 6:00 UTC (adjust as needed)
-    - cron: '0 6 * * *'
-  workflow_dispatch:   # allows manual trigger
+    - cron: '0 6 * * *'   # 6:00 AM UTC daily
+  workflow_dispatch:        # allows manual trigger
 
 jobs:
   generate-post:
     runs-on: ubuntu-latest
-    
     permissions:
-      contents: write  # Needed to push changes
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Full history for better logging
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-          cache: 'pip'
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: pip install zhipuai
 
       - name: Run blog generator
-        run: python scripts/generate_blog.py
         env:
-          PYTHONUNBUFFERED: 1  # Ensure real-time logging
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+        run: python scripts/generate_blog.py
 
       - name: Commit and push changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add blog/
-          
-          # Check if there are changes to commit
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "📝 Add daily blog post for $(date +'%Y-%m-%d') [skip ci]"
-            git push
-          fi
+          git add blog/ blog_generator.log
+          git diff --quiet && git diff --staged --quiet || git commit -m "📝 Add daily blog post for $(date +'%Y-%m-%d') [skip ci]"
+          git push
