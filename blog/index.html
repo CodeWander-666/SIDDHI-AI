@@ -2,31 +2,23 @@
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <meta name="google-site-verification" content="mXzGHeQy9yGNuw8JTuzgXdDUn-gUcj4C65Jt83rcK9A" />
-    <meta name="description" content="SIDDHI AI Blog: expert articles on Python, AI, digital marketing & web development – tailored for Madhya Pradesh businesses.">
-    <meta name="keywords" content="python tutorial, digital marketing blog, web development tips, AI blog, SEO guide, Bhopal, Indore">
-    <meta name="author" content="SIDDHI AI">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://siddhiai.com/blog">
-    <meta property="og:title" content="SIDDHI AI Blog – Insights & Tutorials">
-    <meta property="og:description" content="In‑depth articles on Python, AI, digital marketing, and web development.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIDDHI AI Blog - Insights & Articles</title>
+    <meta name="description" content="Expert insights on Python training, digital marketing, web development, and AI solutions. SIDDHI AI's official blog with daily updates and industry trends.">
+    <meta name="keywords" content="Python training blog, digital marketing tips, web development articles, AI insights, SEO guide, Madhya Pradesh, India">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="SIDDHI AI Blog">
+    <meta property="og:description" content="Expert insights on Python training, digital marketing, web development, and AI solutions.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://siddhiai.com/blog">
-    <meta property="og:image" content="https://siddhiai.com/og-blog.jpg">
-    <meta name="geo.region" content="IN-MP">
-    <meta name="geo.placename" content="Madhya Pradesh">
-    <title>SIDDHI AI | Blog</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cfilter id='glow' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='5' result='blur'/%3E%3CfeMerge%3E%3CfeMergeNode in='blur'/%3E%3CfeMergeNode in='blur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect width='100' height='100' fill='%23020203' rx='15'/%3E%3Ctext x='50' y='75' font-family='sans-serif' font-size='72' font-style='italic' font-weight='normal' fill='%23E5B769' text-anchor='middle' filter='url(%23glow)'%3EAI%3C/text%3E%3Ctext x='50' y='75' font-family='sans-serif' font-size='72' font-style='italic' font-weight='normal' fill='%23FFF8DC' text-anchor='middle'%3EAI%3C/text%3E%3C/svg%3E">
-    <!-- Tailwind, Icons, GSAP, Fonts -->
+    <meta property="og:url" content="https://siddhiai-welcome.vercel.app/blog/">
+    
+    <!-- Tailwind & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
     <style>
-        /* ========== PASTE YOUR EXACT STYLES FROM MAIN INDEX.HTML HERE ========== */
         :root {
             --bg-rgb: 2, 2, 3;
             --accent-rgb: 229, 183, 105;
@@ -34,1146 +26,210 @@
             --text-rgb: 229, 231, 235;
             --text-muted-rgb: 156, 163, 175;
             --card-bg: rgba(8, 8, 10, 0.75);
-            --tooltip-bg: rgba(2, 2, 3, 0.95);
         }
-        [data-theme="rich"] { /* ... */ }
-        [data-theme="sunny"] { /* ... */ }
-        body { background-color: rgb(var(--bg-rgb)); color: rgb(var(--text-rgb)); overflow-x: hidden; }
-        #webgl-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -10; }
-        .ambient-overlay { position: fixed; inset: 0; background: radial-gradient(circle at center, transparent 0%, rgb(var(--bg-rgb)) 100%); z-index: -5; }
-        .glass-panel { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid rgba(var(--accent-rgb), 0.3); }
-        .gold-gradient { background: linear-gradient(135deg, rgb(var(--accent-rgb)) 0%, #FFF8DC 50%, rgb(var(--accent-rgb)) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        /* ... include all your CSS classes (RGB cards, tilt, mobile menu, etc.) ... */
+        [data-theme="rich"] {
+            --bg-rgb: 26, 11, 46;
+            --accent-rgb: 212, 175, 55;
+            --tech-rgb: 255, 42, 109;
+            --text-rgb: 243, 232, 255;
+            --text-muted-rgb: 216, 180, 226;
+            --card-bg: rgba(26, 11, 46, 0.75);
+        }
+        [data-theme="sunny"] {
+            --bg-rgb: 224, 242, 254;
+            --accent-rgb: 245, 158, 11;
+            --tech-rgb: 2, 132, 199;
+            --text-rgb: 15, 23, 42;
+            --text-muted-rgb: 71, 85, 105;
+            --card-bg: rgba(255, 255, 255, 0.6);
+        }
+        body {
+            background-color: rgb(var(--bg-rgb));
+            color: rgb(var(--text-rgb));
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(var(--accent-rgb), 0.3);
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, rgb(var(--accent-rgb)) 0%, #FFF8DC 50%, rgb(var(--accent-rgb)) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .tilt-wrapper { perspective: 1200px; }
+        .rgb-card {
+            position: relative;
+            background: rgb(var(--bg-rgb));
+            border-radius: 1.5rem;
+            overflow: hidden;
+            height: 100%;
+            min-height: 320px;
+        }
+        .rgb-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(rgb(var(--tech-rgb)), rgb(var(--accent-rgb)), #FF0055, #9D00FF, rgb(var(--tech-rgb)));
+            animation: rgbSpin 4s linear infinite;
+            opacity: 0.3;
+        }
+        .rgb-card:hover::before {
+            opacity: 1;
+        }
+        .rgb-content {
+            position: absolute;
+            inset: 2px;
+            background: var(--card-bg);
+            border-radius: calc(1.5rem - 2px);
+            z-index: 10;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 4px);
+        }
+        @keyframes rgbSpin {
+            100% { transform: rotate(360deg); }
+        }
+        .btn-creepy {
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-creepy .eyes-wrapper {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .btn-creepy:hover .eyes-wrapper {
+            opacity: 1;
+        }
+        .btn-creepy:hover .btn-text-content {
+            transform: translateX(-15px);
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        @media (max-width: 768px) {
+            .mobile-menu-toggle { display: block; }
+        }
     </style>
+    
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        obsidian: 'rgba(var(--bg-rgb), <alpha-value>)',
-                        accent: 'rgba(var(--accent-rgb), <alpha-value>)',
-                        tech: 'rgba(var(--tech-rgb), <alpha-value>)',
-                        textmain: 'rgba(var(--text-rgb), <alpha-value>)',
-                        textmuted: 'rgba(var(--text-muted-rgb), <alpha-value>)',
-                    },
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        serif: ['"Playfair Display"', 'serif'],
-                    }
-                }
-            }
-        }
         function changeTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
-            window.dispatchEvent(new CustomEvent('themeChanged', { detail: theme }));
         }
     </script>
-    <!-- Shaders & import map (same as main) -->
-    <script id="vertexShader" type="x-shader/x-vertex">/* ... */</script>
-    <script id="fragmentShader" type="x-shader/x-fragment">/* ... */</script>
-    <script type="importmap">{}</script>
 </head>
 <body>
-    <canvas id="webgl-canvas"></canvas>
-    <div class="ambient-overlay"></div>
-
-    <div id="ui-layer" class="relative z-10 w-full">
-        <!-- NAVBAR (copy from main, links adjusted to ../) -->
-        <nav class="fixed w-full z-50 transition-all duration-300 interactive-ui backdrop-blur-md border-b border-textmain/10 bg-obsidian/40" id="navbar">
-            <div class="max-w-7xl mx-auto px-6 lg:px-12">
-                <div class="flex justify-between items-center h-20">
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="cpu" class="text-accent w-6 h-6"></i>
-                        <span class="font-extrabold text-xl tracking-tighter text-textmain">SIDDHI <span class="text-accent">AI</span></span>
-                    </div>
-                    <div class="hidden md:flex items-center space-x-6">
-                        <a href="../index.html" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Home</a>
-                        <a href="#blog-posts" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Articles</a>
-                        <a href="#faq" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">FAQs</a>
-                        <!-- Theme toggles -->
-                        <div class="flex items-center gap-2 ml-4 border-l border-textmuted/30 pl-6">
-                            <button onclick="changeTheme('dark')" class="w-4 h-4 rounded-full bg-[#020203] border-2 border-gray-500" title="Dark Theme"></button>
-                            <button onclick="changeTheme('rich')" class="w-4 h-4 rounded-full bg-[#1a0b2e] border-2 border-[#d4af37]" title="Rich Theme"></button>
-                            <button onclick="changeTheme('sunny')" class="w-4 h-4 rounded-full bg-[#e0f2fe] border-2 border-[#f59e0b]" title="Sunny Theme"></button>
-                        </div>
-                    </div>
-                    <a href="../index.html#contact" class="hidden md:flex bg-accent text-obsidian px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
-                        <span class="btn-text-content">Start Project</span>
-                        <div class="eyes-wrapper">...</div>
-                    </a>
-                    <!-- Mobile menu toggle -->
-                    <button class="mobile-menu-toggle md:hidden" id="mobileMenuToggle">...</button>
-                </div>
-            </div>
-        </nav>
-        <!-- Mobile menu overlay (same) -->
-        <div class="mobile-menu-overlay" id="mobileMenuOverlay">...</div>
-
-        <!-- MAIN BLOG CONTENT – SINGLE INSTANCE -->
-        <main class="pt-32 pb-20 interactive-ui">
-            <div class="max-w-7xl mx-auto px-6">
-                <!-- Header with Search -->
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-textmain/10 bg-textmain/5 mb-4">
-                        <i data-lucide="book-open" class="w-3 h-3 text-tech"></i>
-                        <span class="text-[9px] font-bold text-tech uppercase tracking-widest">Knowledge Base</span>
-                    </div>
-                    <h1 class="font-serif text-5xl md:text-6xl text-textmain mb-6">The <span class="gold-gradient italic">Insights</span> Blog</h1>
-                    <p class="text-textmuted text-sm font-light max-w-xl mx-auto">Expert articles on Python, AI, digital marketing & web development – tailored for Madhya Pradesh businesses.</p>
-                    <!-- Search Bar -->
-                    <div class="mt-10 relative max-w-xl mx-auto">
-                        <i data-lucide="search" class="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-textmuted"></i>
-                        <input type="text" id="blogSearch" placeholder="Search articles or FAQs..." class="w-full pl-12 pr-6 py-4 rounded-full glass-panel border border-textmain/20 text-textmain placeholder:text-textmuted/50 focus:outline-none focus:border-accent text-sm">
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 backdrop-blur-md border-b border-textmain/10 bg-obsidian/40">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="flex justify-between items-center h-20">
+                <a href="https://siddhiai-welcome.vercel.app" class="flex items-center gap-3">
+                    <i data-lucide="cpu" class="text-accent w-6 h-6"></i>
+                    <span class="font-extrabold text-xl tracking-tighter">SIDDHI <span class="text-accent">AI</span></span>
+                </a>
+                
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="https://siddhiai-welcome.vercel.app/#benefits" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent">Why Us</a>
+                    <a href="https://siddhiai-welcome.vercel.app/#architectures" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent">Services</a>
+                    <a href="https://siddhiai-welcome.vercel.app/#global-reach" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent">Global Reach</a>
+                    <a href="/blog" class="text-[10px] uppercase tracking-[0.2em] font-bold text-accent">Blog</a>
+                    
+                    <div class="flex items-center gap-2 ml-4 border-l border-textmuted/30 pl-6">
+                        <button onclick="changeTheme('dark')" class="w-4 h-4 rounded-full bg-[#020203] border-2 border-gray-500"></button>
+                        <button onclick="changeTheme('rich')" class="w-4 h-4 rounded-full bg-[#1a0b2e] border-2 border-[#d4af37]"></button>
+                        <button onclick="changeTheme('sunny')" class="w-4 h-4 rounded-full bg-[#e0f2fe] border-2 border-[#f59e0b]"></button>
                     </div>
                 </div>
-
-                <!-- Blog Posts Grid – THIS IS THE ONLY CONTAINER -->
-                <section id="blog-posts" class="mb-24">
-                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Latest Articles</h2>
-                    <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-                        <!-- POSTS WILL BE INSERTED HERE BY GENERATOR -->
+                
+                <a href="https://siddhiai-welcome.vercel.app/#contact" class="hidden md:flex bg-accent text-obsidian px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
+                    <span class="btn-text-content">Start Project</span>
+                    <div class="eyes-wrapper">
+                        <div class="creepy-eye"><div class="creepy-pupil"></div></div>
+                        <div class="creepy-eye"><div class="creepy-pupil"></div></div>
                     </div>
-                    <div id="noPostsMsg" class="hidden text-center py-20 text-textmuted text-sm italic">No matching articles found.</div>
-                </section>
-
-                <!-- FAQ Section (static) -->
-                <section id="faq" class="mb-24">
-                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Frequently Asked Questions</h2>
-                    <div id="faqContainer" class="max-w-3xl mx-auto glass-panel rounded-2xl p-6 md:p-10">
-                        <!-- FAQs will be inserted by JavaScript (if you have dynamic FAQs) -->
-                    </div>
-                    <div id="noFaqMsg" class="hidden text-center py-10 text-textmuted text-sm italic">No matching FAQs.</div>
-                </section>
-
-                <!-- Contact CTA -->
-                <div class="text-center mt-16">
-                    <p class="text-textmuted text-sm mb-4">Need a custom solution?</p>
-                    <a href="../index.html#contact" class="inline-flex bg-accent text-obsidian px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
-                        <span class="btn-text-content">Contact our team</span>
-                        <div class="eyes-wrapper">...</div>
-                    </a>
-                </div>
-            </div>
-        </main>
-
-        <!-- FOOTER (copy from main, links adjusted) -->
-        <footer class="py-12 border-t border-textmain/10 bg-obsidian interactive-ui">
-            <div class="max-w-7xl mx-auto px-6 text-center">
-                <span class="font-extrabold text-2xl tracking-tighter text-textmain mb-6 block drop-shadow-lg">SIDDHI <span class="text-accent">AI</span></span>
-                <div class="flex flex-wrap items-center justify-center gap-6 mb-8">
-                    <a href="https://github.com/CodeWander-666-github" target="_blank" class="text-textmuted hover:text-accent"><i data-lucide="github" class="w-6 h-6"></i></a>
-                    <a href="#" class="text-textmuted hover:text-accent"><i data-lucide="chrome" class="w-6 h-6"></i></a>
-                    <div class="flex items-center gap-1 text-textmuted"><i data-lucide="badge-check" class="w-5 h-5 text-accent"></i><span class="text-[10px] font-bold uppercase">GST</span></div>
-                    <div class="flex items-center gap-1 text-textmuted"><i data-lucide="badge-check" class="w-5 h-5 text-accent"></i><span class="text-[10px] font-bold uppercase">Udyam</span></div>
-                </div>
-                <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-[9px] text-textmuted uppercase tracking-[0.2em] font-bold">
-                    <a href="../policy.html" class="hover:text-accent">Terms & Conditions</a>
-                    <span class="text-textmain/20">|</span>
-                    <a href="../policy.html" class="hover:text-accent">Privacy Policy</a>
-                </div>
-                <p class="text-[9px] text-textmuted uppercase tracking-[0.3em] font-bold">&copy; 2017-2026. Business Web Solutions.</p>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Exit button (unused) -->
-    <button id="exit-interactive" class="fixed top-8 right-8 ...">Exit 3D Mode</button>
-
-    <!-- Hidden SEO Keywords -->
-    <div style="display:none;">python training Bhopal, digital marketing Indore, ...</div>
-
-    <!-- JSON‑LD Schema (will be updated by generator) -->
-    <script type="application/ld+json" id="blogSchema">{}</script>
-
-    <!-- JS Module (paste your full Three.js/theme code here, but remove any hardcoded blogPosts) -->
-    <script type="module">
-        // ====== PASTE YOUR EXACT THREE.JS CODE FROM MAIN INDEX.HTML HERE ======
-        // Include all Three.js, theme switching, mobile menu, and the search filter.
-        // Make sure to remove any hardcoded blogPosts array.
-        const searchInput = document.getElementById('blogSearch');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                const val = e.target.value.toLowerCase();
-                const cards = document.querySelectorAll('.blog-card');
-                cards.forEach(card => {
-                    const text = card.innerText.toLowerCase();
-                    card.style.display = text.includes(val) ? 'block' : 'none';
-                });
-            });
-        }
-    </script>
-</body>
-</html>            --tooltip-bg: rgba(2, 2, 3, 0.95);
-        }
-        /* ... include all your CSS classes (RGB cards, tilt, mobile menu, etc.) ... */
-    </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        obsidian: 'rgba(var(--bg-rgb), <alpha-value>)',
-                        accent: 'rgba(var(--accent-rgb), <alpha-value>)',
-                        tech: 'rgba(var(--tech-rgb), <alpha-value>)',
-                        textmain: 'rgba(var(--text-rgb), <alpha-value>)',
-                        textmuted: 'rgba(var(--text-muted-rgb), <alpha-value>)',
-                    },
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        serif: ['"Playfair Display"', 'serif'],
-                    }
-                }
-            }
-        }
-        function changeTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            window.dispatchEvent(new CustomEvent('themeChanged', { detail: theme }));
-        }
-    </script>
-    <!-- Shaders & import map (same as main) -->
-    <script id="vertexShader" type="x-shader/x-vertex">/* ... */</script>
-    <script id="fragmentShader" type="x-shader/x-fragment">/* ... */</script>
-    <script type="importmap">{}</script>
-</head>
-<body>
-    <canvas id="webgl-canvas"></canvas>
-    <div class="ambient-overlay"></div>
-
-    <div id="ui-layer" class="relative z-10 w-full">
-        <!-- NAVBAR (copy from main, links adjusted to ../) -->
-        <nav class="fixed w-full z-50 transition-all duration-300 interactive-ui backdrop-blur-md border-b border-textmain/10 bg-obsidian/40" id="navbar">
-            <div class="max-w-7xl mx-auto px-6 lg:px-12">
-                <div class="flex justify-between items-center h-20">
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="cpu" class="text-accent w-6 h-6"></i>
-                        <span class="font-extrabold text-xl tracking-tighter text-textmain">SIDDHI <span class="text-accent">AI</span></span>
-                    </div>
-                    <div class="hidden md:flex items-center space-x-6">
-                        <a href="../index.html" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Home</a>
-                        <a href="#blog-posts" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Articles</a>
-                        <a href="#faq" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">FAQs</a>
-                        <!-- Theme toggles -->
-                        <div class="flex items-center gap-2 ml-4 border-l border-textmuted/30 pl-6">
-                            <button onclick="changeTheme('dark')" class="w-4 h-4 rounded-full bg-[#020203] border-2 border-gray-500" title="Dark Theme"></button>
-                            <button onclick="changeTheme('rich')" class="w-4 h-4 rounded-full bg-[#1a0b2e] border-2 border-[#d4af37]" title="Rich Theme"></button>
-                            <button onclick="changeTheme('sunny')" class="w-4 h-4 rounded-full bg-[#e0f2fe] border-2 border-[#f59e0b]" title="Sunny Theme"></button>
-                        </div>
-                    </div>
-                    <a href="../index.html#contact" class="hidden md:flex bg-accent text-obsidian px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
-                        <span class="btn-text-content">Start Project</span>
-                        <div class="eyes-wrapper">...</div>
-                    </a>
-                    <!-- Mobile menu toggle -->
-                    <button class="mobile-menu-toggle md:hidden" id="mobileMenuToggle">...</button>
-                </div>
-            </div>
-        </nav>
-        <!-- Mobile menu overlay (same) -->
-        <div class="mobile-menu-overlay" id="mobileMenuOverlay">...</div>
-
-        <!-- MAIN BLOG CONTENT – SINGLE INSTANCE -->
-        <main class="pt-32 pb-20 interactive-ui">
-            <div class="max-w-7xl mx-auto px-6">
-                <!-- Header with Search -->
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-textmain/10 bg-textmain/5 mb-4">
-                        <i data-lucide="book-open" class="w-3 h-3 text-tech"></i>
-                        <span class="text-[9px] font-bold text-tech uppercase tracking-widest">Knowledge Base</span>
-                    </div>
-                    <h1 class="font-serif text-5xl md:text-6xl text-textmain mb-6">The <span class="gold-gradient italic">Insights</span> Blog</h1>
-                    <p class="text-textmuted text-sm font-light max-w-xl mx-auto">Expert articles on Python, AI, digital marketing & web development – tailored for Madhya Pradesh businesses.</p>
-                    <!-- Search Bar -->
-                    <div class="mt-10 relative max-w-xl mx-auto">
-                        <i data-lucide="search" class="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-textmuted"></i>
-                        <input type="text" id="blogSearch" placeholder="Search articles or FAQs..." class="w-full pl-12 pr-6 py-4 rounded-full glass-panel border border-textmain/20 text-textmain placeholder:text-textmuted/50 focus:outline-none focus:border-accent text-sm">
-                    </div>
-                </div>
-
-                <!-- Blog Posts Grid – THIS IS THE ONLY CONTAINER -->
-                <section id="blog-posts" class="mb-24">
-                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Latest Articles</h2>
-                    <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-                        <!-- POSTS WILL BE INSERTED HERE BY GENERATOR -->
-                    </div>
-                    <div id="noPostsMsg" class="hidden text-center py-20 text-textmuted text-sm italic">No matching articles found.</div>
-                </section>
-
-                <!-- FAQ Section (static) -->
-                <section id="faq" class="mb-24">
-                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Frequently Asked Questions</h2>
-                    <div id="faqContainer" class="max-w-3xl mx-auto glass-panel rounded-2xl p-6 md:p-10">
-                        <!-- FAQs will be inserted by JavaScript (if you have dynamic FAQs) -->
-                    </div>
-                    <div id="noFaqMsg" class="hidden text-center py-10 text-textmuted text-sm italic">No matching FAQs.</div>
-                </section>
-
-                <!-- Contact CTA -->
-                <div class="text-center mt-16">
-                    <p class="text-textmuted text-sm mb-4">Need a custom solution?</p>
-                    <a href="../index.html#contact" class="inline-flex bg-accent text-obsidian px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
-                        <span class="btn-text-content">Contact our team</span>
-                        <div class="eyes-wrapper">...</div>
-                    </a>
-                </div>
-            </div>
-        </main>
-
-        <!-- FOOTER (copy from main, links adjusted) -->
-        <footer class="py-12 border-t border-textmain/10 bg-obsidian interactive-ui">
-            <div class="max-w-7xl mx-auto px-6 text-center">
-                <span class="font-extrabold text-2xl tracking-tighter text-textmain mb-6 block drop-shadow-lg">SIDDHI <span class="text-accent">AI</span></span>
-                <div class="flex flex-wrap items-center justify-center gap-6 mb-8">
-                    <a href="https://github.com/CodeWander-666-github" target="_blank" class="text-textmuted hover:text-accent"><i data-lucide="github" class="w-6 h-6"></i></a>
-                    <a href="#" class="text-textmuted hover:text-accent"><i data-lucide="chrome" class="w-6 h-6"></i></a>
-                    <div class="flex items-center gap-1 text-textmuted"><i data-lucide="badge-check" class="w-5 h-5 text-accent"></i><span class="text-[10px] font-bold uppercase">GST</span></div>
-                    <div class="flex items-center gap-1 text-textmuted"><i data-lucide="badge-check" class="w-5 h-5 text-accent"></i><span class="text-[10px] font-bold uppercase">Udyam</span></div>
-                </div>
-                <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-[9px] text-textmuted uppercase tracking-[0.2em] font-bold">
-                    <a href="../policy.html" class="hover:text-accent">Terms & Conditions</a>
-                    <span class="text-textmain/20">|</span>
-                    <a href="../policy.html" class="hover:text-accent">Privacy Policy</a>
-                </div>
-                <p class="text-[9px] text-textmuted uppercase tracking-[0.3em] font-bold">&copy; 2017-2026. Business Web Solutions.</p>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Exit button (unused) -->
-    <button id="exit-interactive" class="fixed top-8 right-8 ...">Exit 3D Mode</button>
-
-    <!-- Hidden SEO Keywords -->
-    <div style="display:none;">python training Bhopal, digital marketing Indore, ...</div>
-
-    <!-- JSON‑LD Schema (will be updated by generator) -->
-    <script type="application/ld+json" id="blogSchema">{}</script>
-
-    <!-- JS Module (paste your full Three.js/theme code here, but remove any hardcoded blogPosts) -->
-    <script type="module">
-        // ====== PASTE YOUR EXACT THREE.JS CODE FROM MAIN INDEX.HTML HERE ======
-        // Include all Three.js, theme switching, mobile menu, and the search filter.
-        // Make sure to remove any hardcoded blogPosts array.
-        const searchInput = document.getElementById('blogSearch');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                const val = e.target.value.toLowerCase();
-                const cards = document.querySelectorAll('.blog-card');
-                cards.forEach(card => {
-                    const text = card.innerText.toLowerCase();
-                    card.style.display = text.includes(val) ? 'block' : 'none';
-                });
-            });
-        }
-    </script>
-</body>
-</html>            --tooltip-bg: rgba(2, 2, 3, 0.95);
-        }
-        [data-theme="rich"] { /* ... */ }
-        [data-theme="sunny"] { /* ... */ }
-        body { background-color: rgb(var(--bg-rgb)); color: rgb(var(--text-rgb)); overflow-x: hidden; }
-        #webgl-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -10; }
-        .ambient-overlay { position: fixed; inset: 0; background: radial-gradient(circle at center, transparent 0%, rgb(var(--bg-rgb)) 100%); z-index: -5; }
-        .glass-panel { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid rgba(var(--accent-rgb), 0.3); }
-        .gold-gradient { background: linear-gradient(135deg, rgb(var(--accent-rgb)) 0%, #FFF8DC 50%, rgb(var(--accent-rgb)) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        /* ... include all your CSS classes (RGB cards, tilt, mobile menu, etc.) ... */
-    </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        obsidian: 'rgba(var(--bg-rgb), <alpha-value>)',
-                        accent: 'rgba(var(--accent-rgb), <alpha-value>)',
-                        tech: 'rgba(var(--tech-rgb), <alpha-value>)',
-                        textmain: 'rgba(var(--text-rgb), <alpha-value>)',
-                        textmuted: 'rgba(var(--text-muted-rgb), <alpha-value>)',
-                    },
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        serif: ['"Playfair Display"', 'serif'],
-                    }
-                }
-            }
-        }
-        function changeTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            window.dispatchEvent(new CustomEvent('themeChanged', { detail: theme }));
-        }
-    </script>
-    <!-- Shaders & import map (same as main) -->
-    <script id="vertexShader" type="x-shader/x-vertex">/* ... */</script>
-    <script id="fragmentShader" type="x-shader/x-fragment">/* ... */</script>
-    <script type="importmap">{}</script>
-</head>
-<body>
-    <canvas id="webgl-canvas"></canvas>
-    <div class="ambient-overlay"></div>
-
-    <div id="ui-layer" class="relative z-10 w-full">
-        <!-- NAVBAR (copy from main, links adjusted to ../) -->
-        <nav class="fixed w-full z-50 transition-all duration-300 interactive-ui backdrop-blur-md border-b border-textmain/10 bg-obsidian/40" id="navbar">
-            <div class="max-w-7xl mx-auto px-6 lg:px-12">
-                <div class="flex justify-between items-center h-20">
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="cpu" class="text-accent w-6 h-6"></i>
-                        <span class="font-extrabold text-xl tracking-tighter text-textmain">SIDDHI <span class="text-accent">AI</span></span>
-                    </div>
-                    <div class="hidden md:flex items-center space-x-6">
-                        <a href="../index.html" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Home</a>
-                        <a href="#blog-posts" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Articles</a>
-                        <a href="#faq" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">FAQs</a>
-                        <!-- Theme toggles -->
-                        <div class="flex items-center gap-2 ml-4 border-l border-textmuted/30 pl-6">
-                            <button onclick="changeTheme('dark')" class="w-4 h-4 rounded-full bg-[#020203] border-2 border-gray-500" title="Dark Theme"></button>
-                            <button onclick="changeTheme('rich')" class="w-4 h-4 rounded-full bg-[#1a0b2e] border-2 border-[#d4af37]" title="Rich Theme"></button>
-                            <button onclick="changeTheme('sunny')" class="w-4 h-4 rounded-full bg-[#e0f2fe] border-2 border-[#f59e0b]" title="Sunny Theme"></button>
-                        </div>
-                    </div>
-                    <a href="../index.html#contact" class="hidden md:flex bg-accent text-obsidian px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
-                        <span class="btn-text-content">Start Project</span>
-                        <div class="eyes-wrapper">...</div>
-                    </a>
-                    <!-- Mobile menu toggle -->
-                    <button class="mobile-menu-toggle md:hidden" id="mobileMenuToggle">...</button>
-                </div>
-            </div>
-        </nav>
-        <!-- Mobile menu overlay (same) -->
-        <div class="mobile-menu-overlay" id="mobileMenuOverlay">...</div>
-
-        <!-- MAIN BLOG CONTENT – SINGLE INSTANCE -->
-        <main class="pt-32 pb-20 interactive-ui">
-            <div class="max-w-7xl mx-auto px-6">
-                <!-- Header with Search -->
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-textmain/10 bg-textmain/5 mb-4">
-                        <i data-lucide="book-open" class="w-3 h-3 text-tech"></i>
-                        <span class="text-[9px] font-bold text-tech uppercase tracking-widest">Knowledge Base</span>
-                    </div>
-                    <h1 class="font-serif text-5xl md:text-6xl text-textmain mb-6">The <span class="gold-gradient italic">Insights</span> Blog</h1>
-                    <p class="text-textmuted text-sm font-light max-w-xl mx-auto">Expert articles on Python, AI, digital marketing & web development – tailored for Madhya Pradesh businesses.</p>
-                    <!-- Search Bar -->
-                    <div class="mt-10 relative max-w-xl mx-auto">
-                        <i data-lucide="search" class="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-textmuted"></i>
-                        <input type="text" id="blogSearch" placeholder="Search articles or FAQs..." class="w-full pl-12 pr-6 py-4 rounded-full glass-panel border border-textmain/20 text-textmain placeholder:text-textmuted/50 focus:outline-none focus:border-accent text-sm">
-                    </div>
-                </div>
-
-                <!-- Blog Posts Grid – THIS IS THE ONLY CONTAINER -->
-                <section id="blog-posts" class="mb-24">
-                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Latest Articles</h2>
-                    <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-                        <!-- POSTS WILL BE INSERTED HERE BY GENERATOR -->
-                    </div>
-                    <div id="noPostsMsg" class="hidden text-center py-20 text-textmuted text-sm italic">No matching articles found.</div>
-                </section>
-
-                <!-- FAQ Section (static) -->
-                <section id="faq" class="mb-24">
-                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Frequently Asked Questions</h2>
-                    <div id="faqContainer" class="max-w-3xl mx-auto glass-panel rounded-2xl p-6 md:p-10">
-                        <!-- FAQs will be inserted by JavaScript (if you have dynamic FAQs) -->
-                    </div>
-                    <div id="noFaqMsg" class="hidden text-center py-10 text-textmuted text-sm italic">No matching FAQs.</div>
-                </section>
-
-                <!-- Contact CTA -->
-                <div class="text-center mt-16">
-                    <p class="text-textmuted text-sm mb-4">Need a custom solution?</p>
-                    <a href="../index.html#contact" class="inline-flex bg-accent text-obsidian px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
-                        <span class="btn-text-content">Contact our team</span>
-                        <div class="eyes-wrapper">...</div>
-                    </a>
-                </div>
-            </div>
-        </main>
-
-        <!-- FOOTER (copy from main, links adjusted) -->
-        <footer class="py-12 border-t border-textmain/10 bg-obsidian interactive-ui">
-            <div class="max-w-7xl mx-auto px-6 text-center">
-                <span class="font-extrabold text-2xl tracking-tighter text-textmain mb-6 block drop-shadow-lg">SIDDHI <span class="text-accent">AI</span></span>
-                <div class="flex flex-wrap items-center justify-center gap-6 mb-8">
-                    <a href="https://github.com/CodeWander-666-github" target="_blank" class="text-textmuted hover:text-accent"><i data-lucide="github" class="w-6 h-6"></i></a>
-                    <a href="#" class="text-textmuted hover:text-accent"><i data-lucide="chrome" class="w-6 h-6"></i></a>
-                    <div class="flex items-center gap-1 text-textmuted"><i data-lucide="badge-check" class="w-5 h-5 text-accent"></i><span class="text-[10px] font-bold uppercase">GST</span></div>
-                    <div class="flex items-center gap-1 text-textmuted"><i data-lucide="badge-check" class="w-5 h-5 text-accent"></i><span class="text-[10px] font-bold uppercase">Udyam</span></div>
-                </div>
-                <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-[9px] text-textmuted uppercase tracking-[0.2em] font-bold">
-                    <a href="../policy.html" class="hover:text-accent">Terms & Conditions</a>
-                    <span class="text-textmain/20">|</span>
-                    <a href="../policy.html" class="hover:text-accent">Privacy Policy</a>
-                </div>
-                <p class="text-[9px] text-textmuted uppercase tracking-[0.3em] font-bold">&copy; 2017-2026. Business Web Solutions.</p>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Exit button (unused) -->
-    <button id="exit-interactive" class="fixed top-8 right-8 ...">Exit 3D Mode</button>
-
-    <!-- Hidden SEO Keywords -->
-    <div style="display:none;">python training Bhopal, digital marketing Indore, ...</div>
-
-    <!-- JSON‑LD Schema (will be updated by generator) -->
-    <script type="application/ld+json" id="blogSchema">{}</script>
-
-    <!-- JS Module (paste your full Three.js/theme code here, but remove any hardcoded blogPosts) -->
-    <script type="module">
-        // ====== PASTE YOUR EXACT THREE.JS CODE FROM MAIN INDEX.HTML HERE ======
-        // Include all Three.js, theme switching, mobile menu, and the search filter.
-        // Make sure to remove any hardcoded blogPosts array.
-        // Example search filter (if you have static cards later):
-        const searchInput = document.getElementById('blogSearch');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                const val = e.target.value.toLowerCase();
-                const cards = document.querySelectorAll('.blog-card');
-                cards.forEach(card => {
-                    const text = card.innerText.toLowerCase();
-                    card.style.display = text.includes(val) ? 'block' : 'none';
-                });
-            });
-        }
-    </script>
-</body>
-</html>            --tooltip-bg: rgba(2, 2, 3, 0.95);
-        }
-        [data-theme="rich"] { /* ... */ }
-        [data-theme="sunny"] { /* ... */ }
-        body { background-color: rgb(var(--bg-rgb)); color: rgb(var(--text-rgb)); overflow-x: hidden; }
-        #webgl-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -10; }
-        .ambient-overlay { position: fixed; inset: 0; background: radial-gradient(circle at center, transparent 0%, rgb(var(--bg-rgb)) 100%); z-index: -5; }
-        .glass-panel { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid rgba(var(--accent-rgb), 0.3); }
-        .gold-gradient { background: linear-gradient(135deg, rgb(var(--accent-rgb)) 0%, #FFF8DC 50%, rgb(var(--accent-rgb)) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        /* ... include all your CSS classes (RGB cards, tilt, mobile menu, etc.) ... */
-    </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        obsidian: 'rgba(var(--bg-rgb), <alpha-value>)',
-                        accent: 'rgba(var(--accent-rgb), <alpha-value>)',
-                        tech: 'rgba(var(--tech-rgb), <alpha-value>)',
-                        textmain: 'rgba(var(--text-rgb), <alpha-value>)',
-                        textmuted: 'rgba(var(--text-muted-rgb), <alpha-value>)',
-                    },
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        serif: ['"Playfair Display"', 'serif'],
-                    }
-                }
-            }
-        }
-        function changeTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            window.dispatchEvent(new CustomEvent('themeChanged', { detail: theme }));
-        }
-    </script>
-    <!-- Shaders & import map (same as main) -->
-    <script id="vertexShader" type="x-shader/x-vertex">/* ... */</script>
-    <script id="fragmentShader" type="x-shader/x-fragment">/* ... */</script>
-    <script type="importmap">{}</script>
-</head>
-<body>
-    <canvas id="webgl-canvas"></canvas>
-    <div class="ambient-overlay"></div>
-
-    <div id="ui-layer" class="relative z-10 w-full">
-        <!-- NAVBAR (copy from main, links adjusted to ../) -->
-        <nav class="fixed w-full z-50 transition-all duration-300 interactive-ui backdrop-blur-md border-b border-textmain/10 bg-obsidian/40" id="navbar">
-            <div class="max-w-7xl mx-auto px-6 lg:px-12">
-                <div class="flex justify-between items-center h-20">
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="cpu" class="text-accent w-6 h-6"></i>
-                        <span class="font-extrabold text-xl tracking-tighter text-textmain">SIDDHI <span class="text-accent">AI</span></span>
-                    </div>
-                    <div class="hidden md:flex items-center space-x-6">
-                        <a href="../index.html" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Home</a>
-                        <a href="#blog-posts" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Articles</a>
-                        <a href="#faq" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">FAQs</a>
-                        <!-- Theme toggles -->
-                        <div class="flex items-center gap-2 ml-4 border-l border-textmuted/30 pl-6">
-                            <button onclick="changeTheme('dark')" class="w-4 h-4 rounded-full bg-[#020203] border-2 border-gray-500" title="Dark Theme"></button>
-                            <button onclick="changeTheme('rich')" class="w-4 h-4 rounded-full bg-[#1a0b2e] border-2 border-[#d4af37]" title="Rich Theme"></button>
-                            <button onclick="changeTheme('sunny')" class="w-4 h-4 rounded-full bg-[#e0f2fe] border-2 border-[#f59e0b]" title="Sunny Theme"></button>
-                        </div>
-                    </div>
-                    <a href="../index.html#contact" class="hidden md:flex bg-accent text-obsidian px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
-                        <span class="btn-text-content">Start Project</span>
-                        <div class="eyes-wrapper">...</div>
-                    </a>
-                    <!-- Mobile menu toggle -->
-                    <button class="mobile-menu-toggle md:hidden" id="mobileMenuToggle">...</button>
-                </div>
-            </div>
-        </nav>
-        <!-- Mobile menu overlay (same) -->
-        <div class="mobile-menu-overlay" id="mobileMenuOverlay">...</div>
-
-        <!-- MAIN BLOG CONTENT – SINGLE INSTANCE -->
-        <main class="pt-32 pb-20 interactive-ui">
-            <div class="max-w-7xl mx-auto px-6">
-                <!-- Header with Search -->
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-textmain/10 bg-textmain/5 mb-4">
-                        <i data-lucide="book-open" class="w-3 h-3 text-tech"></i>
-                        <span class="text-[9px] font-bold text-tech uppercase tracking-widest">Knowledge Base</span>
-                    </div>
-                    <h1 class="font-serif text-5xl md:text-6xl text-textmain mb-6">The <span class="gold-gradient italic">Insights</span> Blog</h1>
-                    <p class="text-textmuted text-sm font-light max-w-xl mx-auto">Expert articles on Python, AI, digital marketing & web development – tailored for Madhya Pradesh businesses.</p>
-                    <!-- Search Bar -->
-                    <div class="mt-10 relative max-w-xl mx-auto">
-                        <i data-lucide="search" class="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-textmuted"></i>
-                        <input type="text" id="blogSearch" placeholder="Search articles or FAQs..." class="w-full pl-12 pr-6 py-4 rounded-full glass-panel border border-textmain/20 text-textmain placeholder:text-textmuted/50 focus:outline-none focus:border-accent text-sm">
-                    </div>
-                </div>
-
-                <!-- Blog Posts Grid – THIS IS THE ONLY CONTAINER -->
-                <section id="blog-posts" class="mb-24">
-                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Latest Articles</h2>
-                    <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-                        <!-- POSTS WILL BE INSERTED HERE BY GENERATOR -->
-                    </div>
-                    <div id="noPostsMsg" class="hidden text-center py-20 text-textmuted text-sm italic">No matching articles found.</div>
-                </section>
-
-                <!-- FAQ Section (static) -->
-                <section id="faq" class="mb-24">
-                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Frequently Asked Questions</h2>
-                    <div id="faqContainer" class="max-w-3xl mx-auto glass-panel rounded-2xl p-6 md:p-10">
-                        <!-- FAQs will be inserted by JavaScript (if you have dynamic FAQs) -->
-                    </div>
-                    <div id="noFaqMsg" class="hidden text-center py-10 text-textmuted text-sm italic">No matching FAQs.</div>
-                </section>
-
-                <!-- Contact CTA -->
-                <div class="text-center mt-16">
-                    <p class="text-textmuted text-sm mb-4">Need a custom solution?</p>
-                    <a href="../index.html#contact" class="inline-flex bg-accent text-obsidian px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
-                        <span class="btn-text-content">Contact our team</span>
-                        <div class="eyes-wrapper">...</div>
-                    </a>
-                </div>
-            </div>
-        </main>
-
-        <!-- FOOTER (copy from main, links adjusted) -->
-        <footer class="py-12 border-t border-textmain/10 bg-obsidian interactive-ui">
-            <div class="max-w-7xl mx-auto px-6 text-center">
-                <span class="font-extrabold text-2xl tracking-tighter text-textmain mb-6 block drop-shadow-lg">SIDDHI <span class="text-accent">AI</span></span>
-                <div class="flex flex-wrap items-center justify-center gap-6 mb-8">
-                    <a href="https://github.com/CodeWander-666-github" target="_blank" class="text-textmuted hover:text-accent"><i data-lucide="github" class="w-6 h-6"></i></a>
-                    <a href="#" class="text-textmuted hover:text-accent"><i data-lucide="chrome" class="w-6 h-6"></i></a>
-                    <div class="flex items-center gap-1 text-textmuted"><i data-lucide="badge-check" class="w-5 h-5 text-accent"></i><span class="text-[10px] font-bold uppercase">GST</span></div>
-                    <div class="flex items-center gap-1 text-textmuted"><i data-lucide="badge-check" class="w-5 h-5 text-accent"></i><span class="text-[10px] font-bold uppercase">Udyam</span></div>
-                </div>
-                <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-[9px] text-textmuted uppercase tracking-[0.2em] font-bold">
-                    <a href="../policy.html" class="hover:text-accent">Terms & Conditions</a>
-                    <span class="text-textmain/20">|</span>
-                    <a href="../policy.html" class="hover:text-accent">Privacy Policy</a>
-                </div>
-                <p class="text-[9px] text-textmuted uppercase tracking-[0.3em] font-bold">&copy; 2017-2026. Business Web Solutions.</p>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Exit button (unused) -->
-    <button id="exit-interactive" class="fixed top-8 right-8 ...">Exit 3D Mode</button>
-
-    <!-- Hidden SEO Keywords -->
-    <div style="display:none;">python training Bhopal, digital marketing Indore, ...</div>
-
-    <!-- JSON‑LD Schema (will be updated by generator) -->
-    <script type="application/ld+json" id="blogSchema">{}</script>
-
-    <!-- JS Module (paste your full Three.js/theme code here, but remove any hardcoded blogPosts) -->
-    <script type="module">
-        // ====== PASTE YOUR EXACT THREE.JS CODE FROM MAIN INDEX.HTML HERE ======
-        // Include all Three.js, theme switching, mobile menu, and the search filter.
-        // Make sure to remove any hardcoded blogPosts array.
-        // Example search filter (if you have static cards later):
-        const searchInput = document.getElementById('blogSearch');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                const val = e.target.value.toLowerCase();
-                const cards = document.querySelectorAll('.blog-card');
-                cards.forEach(card => {
-                    const text = card.innerText.toLowerCase();
-                    card.style.display = text.includes(val) ? 'block' : 'none';
-                });
-            });
-        }
-    </script>
-</body>
-</html>            --tooltip-bg: rgba(2, 2, 3, 0.95);
-        }
-        [data-theme="rich"] { /* ... */ }
-        [data-theme="sunny"] { /* ... */ }
-        body { background-color: rgb(var(--bg-rgb)); color: rgb(var(--text-rgb)); overflow-x: hidden; }
-        #webgl-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -10; }
-        .ambient-overlay { position: fixed; inset: 0; background: radial-gradient(circle at center, transparent 0%, rgb(var(--bg-rgb)) 100%); z-index: -5; }
-        .glass-panel { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid rgba(var(--accent-rgb), 0.3); }
-        .gold-gradient { background: linear-gradient(135deg, rgb(var(--accent-rgb)) 0%, #FFF8DC 50%, rgb(var(--accent-rgb)) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        /* ... include all your CSS classes (RGB cards, tilt, mobile menu, etc.) ... */
-    </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        obsidian: 'rgba(var(--bg-rgb), <alpha-value>)',
-                        accent: 'rgba(var(--accent-rgb), <alpha-value>)',
-                        tech: 'rgba(var(--tech-rgb), <alpha-value>)',
-                        textmain: 'rgba(var(--text-rgb), <alpha-value>)',
-                        textmuted: 'rgba(var(--text-muted-rgb), <alpha-value>)',
-                    },
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        serif: ['"Playfair Display"', 'serif'],
-                    }
-                }
-            }
-        }
-        function changeTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            window.dispatchEvent(new CustomEvent('themeChanged', { detail: theme }));
-        }
-    </script>
-    <!-- Shaders & import map (same as main) -->
-    <script id="vertexShader" type="x-shader/x-vertex">/* ... */</script>
-    <script id="fragmentShader" type="x-shader/x-fragment">/* ... */</script>
-    <script type="importmap">{}</script>
-</head>
-<body>
-    <canvas id="webgl-canvas"></canvas>
-    <div class="ambient-overlay"></div>
-
-    <div id="ui-layer" class="relative z-10 w-full">
-        <!-- NAVBAR (copy from main, links adjusted to ../) -->
-        <nav class="fixed w-full z-50 transition-all duration-300 interactive-ui backdrop-blur-md border-b border-textmain/10 bg-obsidian/40" id="navbar">
-            <div class="max-w-7xl mx-auto px-6 lg:px-12">
-                <div class="flex justify-between items-center h-20">
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="cpu" class="text-accent w-6 h-6"></i>
-                        <span class="font-extrabold text-xl tracking-tighter text-textmain">SIDDHI <span class="text-accent">AI</span></span>
-                    </div>
-                    <div class="hidden md:flex items-center space-x-6">
-                        <a href="../index.html" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Home</a>
-                        <a href="#blog-posts" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Articles</a>
-                        <a href="#faq" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">FAQs</a>
-                        <!-- Theme toggles -->
-                        <div class="flex items-center gap-2 ml-4 border-l border-textmuted/30 pl-6">
-                            <button onclick="changeTheme('dark')" class="w-4 h-4 rounded-full bg-[#020203] border-2 border-gray-500" title="Dark Theme"></button>
-                            <button onclick="changeTheme('rich')" class="w-4 h-4 rounded-full bg-[#1a0b2e] border-2 border-[#d4af37]" title="Rich Theme"></button>
-                            <button onclick="changeTheme('sunny')" class="w-4 h-4 rounded-full bg-[#e0f2fe] border-2 border-[#f59e0b]" title="Sunny Theme"></button>
-                        </div>
-                    </div>
-                    <a href="../index.html#contact" class="hidden md:flex bg-accent text-obsidian px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
-                        <span class="btn-text-content">Start Project</span>
-                        <div class="eyes-wrapper">...</div>
-                    </a>
-                    <!-- Mobile menu toggle -->
-                    <button class="mobile-menu-toggle md:hidden" id="mobileMenuToggle">...</button>
-                </div>
-            </div>
-        </nav>
-        <!-- Mobile menu overlay (same) -->
-        <div class="mobile-menu-overlay" id="mobileMenuOverlay">...</div>
-
-        <!-- MAIN BLOG CONTENT -->
-        <main class="pt-32 pb-20 interactive-ui">
-            <div class="max-w-7xl mx-auto px-6">
-                <!-- Header with Search -->
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-textmain/10 bg-textmain/5 mb-4">
-                        <i data-lucide="book-open" class="w-3 h-3 text-tech"></i>
-                        <span class="text-[9px] font-bold text-tech uppercase tracking-widest">Knowledge Base</span>
-                    </div>
-                    <h1 class="font-serif text-5xl md:text-6xl text-textmain mb-6">The <span class="gold-gradient italic">Insights</span> Blog</h1>
-                    <p class="text-textmuted text-sm font-light max-w-xl mx-auto">Expert articles on Python, AI, digital marketing & web development – tailored for Madhya Pradesh businesses.</p>
-                    <!-- Search Bar -->
-                    <div class="mt-10 relative max-w-xl mx-auto">
-                        <i data-lucide="search" class="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-textmuted"></i>
-                        <input type="text" id="blogSearch" placeholder="Search articles or FAQs..." class="w-full pl-12 pr-6 py-4 rounded-full glass-panel border border-textmain/20 text-textmain placeholder:text-textmuted/50 focus:outline-none focus:border-accent text-sm">
-                    </div>
-                </div>
-
-                <!-- Blog Posts Grid (will be filled by generator) -->
-                <section id="blog-posts" class="mb-24">
-                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Latest Articles</h2>
-                    <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-        <div class="tilt-wrapper blog-card gsap-reveal">
-            <div class="rgb-card">
-                <a href="posts/2026-03-12-serviceswebdevelopmentunitedstates.html" class="rgb-content block">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-[8px] font-bold text-tech uppercase tracking-widest">Blog</span>
-                        <span class="text-[8px] text-textmuted">2026-03-12</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-textmain mb-2 leading-tight">Services Web Development United States</h3>
-                    <p class="text-xs text-textmuted font-light flex-1">
-
-
-    
-    
-    
-    
-    
-    
-    
-    Services Web Development United States | SIDDHI AI Blog
-    
-    
-    
-    
-    
-    
-    
-        /* ======…</p>
-                    <div class="mt-4 flex flex-wrap gap-1">
-                        <span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#web development</span><span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#united states</span><span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#web developer</span>
-                    </div>
-                    <span class="mt-4 text-[9px] text-tech hover:text-accent transition-colors self-start uppercase tracking-widest font-bold">Read more →</span>
                 </a>
             </div>
         </div>
-        
-        <div class="tilt-wrapper blog-card gsap-reveal">
-            <div class="rgb-card">
-                <a href="posts/2026-03-12-professionalwebdevelopmentunitedstates.html" class="rgb-content block">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-[8px] font-bold text-tech uppercase tracking-widest">Blog</span>
-                        <span class="text-[8px] text-textmuted">2026-03-12</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-textmain mb-2 leading-tight">Professional Web Development United States</h3>
-                    <p class="text-xs text-textmuted font-light flex-1">
+    </nav>
 
-
-    
-    
-    
-    
-    
-    
-    
-    Professional Web Development United States | SIDDHI AI Blog
-    
-    
-    
-    
-    
-    
-    
-        /* ==…</p>
-                    <div class="mt-4 flex flex-wrap gap-1">
-                        <span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#web development</span><span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#united states</span><span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#web dev</span>
-                    </div>
-                    <span class="mt-4 text-[9px] text-tech hover:text-accent transition-colors self-start uppercase tracking-widest font-bold">Read more →</span>
-                </a>
+    <main class="pt-32 pb-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <!-- Header -->
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/30 bg-accent/10 mb-6">
+                    <span class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>
+                    <span class="text-[9px] font-bold text-accent uppercase tracking-widest">Knowledge Hub</span>
+                </div>
+                <h1 class="font-serif text-5xl md:text-6xl text-textmain mb-4">Blog & <span class="gold-gradient italic">Insights</span></h1>
+                <p class="text-textmuted text-lg font-light">Expert articles on Python, AI, digital marketing, and web development – updated daily.</p>
             </div>
-        </div>
-        </div>
-                    <div id="noPostsMsg" class="hidden text-center py-20 text-textmuted text-sm italic">No matching articles found.</div>
-                </section>
-
-                <!-- FAQ Section (static) -->
-                <section id="faq" class="mb-24">
-                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Frequently Asked Questions</h2>
-                    <div id="faqContainer" class="max-w-3xl mx-auto glass-panel rounded-2xl p-6 md:p-10">
-                        <!-- FAQs will be inserted by JavaScript -->
+            
+            <!-- Blog Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+        <div class="tilt-wrapper h-full">
+            <div class="rgb-card h-full">
+                <div class="rgb-content flex flex-col">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-[9px] font-bold text-accent uppercase tracking-widest">Bhopal, Madhya Pradesh</span>
+                        <span class="text-[9px] text-textmuted">•</span>
+                        <span class="text-[9px] text-textmuted">March 12, 2026</span>
                     </div>
-                    <div id="noFaqMsg" class="hidden text-center py-10 text-textmuted text-sm italic">No matching FAQs.</div>
-                </section>
-
-                <!-- Contact CTA -->
-                <div class="text-center mt-16">
-                    <p class="text-textmuted text-sm mb-4">Need a custom solution?</p>
-                    <a href="../index.html#contact" class="inline-flex bg-accent text-obsidian px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
-                        <span class="btn-text-content">Contact our team</span>
-                        <div class="eyes-wrapper">...</div>
+                    <h3 class="text-xl font-bold text-textmain mb-3 line-clamp-2">Best E-commerce Website in Bhopal, Madhya Pradesh – 2026 Complete Guide</h3>
+                    <p class="text-textmuted text-sm font-light mb-4 flex-1 line-clamp-3">Looking for expert E-commerce Website services in Bhopal, Madhya Pradesh? SIDDHI AI provides top-rated e-commerce websit...</p>
+                    <a href="posts/2026-03-12-ecommercewebsitebhopalmadhyapradesh.html" class="btn-creepy self-start mt-auto bg-transparent border border-accent text-accent px-6 py-2 rounded-full text-[9px] font-bold uppercase tracking-widest hover:bg-accent hover:text-obsidian transition-all">
+                        <span class="btn-text-content">Read More</span>
+                        <div class="eyes-wrapper">
+                            <div class="creepy-eye"><div class="creepy-pupil"></div></div>
+                            <div class="creepy-eye"><div class="creepy-pupil"></div></div>
+                        </div>
                     </a>
                 </div>
             </div>
-        </main>
-
-        <!-- FOOTER (copy from main, links adjusted) -->
-        <footer class="py-12 border-t border-textmain/10 bg-obsidian interactive-ui">
-            <div class="max-w-7xl mx-auto px-6 text-center">
-                <span class="font-extrabold text-2xl tracking-tighter text-textmain mb-6 block drop-shadow-lg">SIDDHI <span class="text-accent">AI</span></span>
-                <div class="flex flex-wrap items-center justify-center gap-6 mb-8">
-                    <a href="https://github.com/CodeWander-666-github" target="_blank" class="text-textmuted hover:text-accent"><i data-lucide="github" class="w-6 h-6"></i></a>
-                    <a href="#" class="text-textmuted hover:text-accent"><i data-lucide="chrome" class="w-6 h-6"></i></a>
-                    <div class="flex items-center gap-1 text-textmuted"><i data-lucide="badge-check" class="w-5 h-5 text-accent"></i><span class="text-[10px] font-bold uppercase">GST</span></div>
-                    <div class="flex items-center gap-1 text-textmuted"><i data-lucide="badge-check" class="w-5 h-5 text-accent"></i><span class="text-[10px] font-bold uppercase">Udyam</span></div>
-                </div>
-                <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-[9px] text-textmuted uppercase tracking-[0.2em] font-bold">
-                    <a href="../policy.html" class="hover:text-accent">Terms & Conditions</a>
-                    <span class="text-textmain/20">|</span>
-                    <a href="../policy.html" class="hover:text-accent">Privacy Policy</a>
-                </div>
-                <p class="text-[9px] text-textmuted uppercase tracking-[0.3em] font-bold">&copy; 2017-2026. Business Web Solutions.</p>
+        </div>
             </div>
-        </footer>
-    </div>
+        </div>
+    </main>
 
-    <!-- Exit button (unused) -->
-    <button id="exit-interactive" class="fixed top-8 right-8 ...">Exit 3D Mode</button>
-
-    <!-- Hidden SEO Keywords -->
-    <div style="display:none;">python training Bhopal, digital marketing Indore, ...</div>
-
-    <!-- JSON‑LD Schema (will be updated by generator) -->
-    <script type="application/ld+json" id="blogSchema">{
-  "@context": "https://schema.org",
-  "@type": "Blog",
-  "name": "SIDDHI AI Blog",
-  "description": "Expert articles on Python, digital marketing, web development, and AI solutions.",
-  "url": "https://siddhiai.com/blog/",
-  "blogPost": [
-    {
-      "@type": "BlogPosting",
-      "headline": "Services Web Development United States",
-      "datePublished": "2026-03-12",
-      "url": "https://siddhiai.com/blog/posts/2026-03-12-serviceswebdevelopmentunitedstates.html"
-    },
-    {
-      "@type": "BlogPosting",
-      "headline": "Professional Web Development United States",
-      "datePublished": "2026-03-12",
-      "url": "https://siddhiai.com/blog/posts/2026-03-12-professionalwebdevelopmentunitedstates.html"
-    }
-  ]
-}</script>
-
-    <!-- JS Module (paste your full Three.js/theme code here, but remove any hardcoded blogPosts) -->
-    <script type="module">
-        // ====== PASTE YOUR EXACT THREE.JS CODE FROM MAIN INDEX.HTML HERE ======
-        // Include all Three.js, theme switching, mobile menu, and the search filter.
-        // Make sure to remove any hardcoded blogPosts array.
-    </script>
-</body>
-</html>    <!-- Shaders & import map -->
-    <script id="vertexShader" type="x-shader/x-vertex">/* ... */</script>
-    <script id="fragmentShader" type="x-shader/x-fragment">/* ... */</script>
-    <script type="importmap">{}</script>
-</head>
-<body>
-    <canvas id="webgl-canvas"></canvas>
-    <div class="ambient-overlay"></div>
-
-    <div id="ui-layer" class="relative z-10 w-full">
-        <!-- NAVBAR (copy from main, adjust links to point to ../index.html) -->
-        <nav class="fixed w-full z-50 ...">
-            <!-- ... -->
-            <div class="hidden md:flex items-center space-x-6">
-                <a href="../index.html" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent">Home</a>
-                <a href="#blog-posts" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent">Articles</a>
-                <a href="#faq" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent">FAQs</a>
-                <!-- Theme toggles -->
-            </div>
-            <a href="../index.html#contact" class="hidden md:flex bg-accent text-obsidian px-6 py-2.5 rounded-full ...">Start Project</a>
-        </nav>
-        <!-- Mobile menu overlay (same) -->
-
-        <!-- MAIN BLOG CONTENT -->
-        <main class="pt-32 pb-20 interactive-ui">
-            <div class="max-w-7xl mx-auto px-6">
-                <!-- Header with Search -->
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-textmain/10 bg-textmain/5 mb-4">
-                        <i data-lucide="book-open" class="w-3 h-3 text-tech"></i>
-                        <span class="text-[9px] font-bold text-tech uppercase tracking-widest">Knowledge Base</span>
-                    </div>
-                    <h1 class="font-serif text-5xl md:text-6xl text-textmain mb-6">The <span class="gold-gradient italic">Insights</span> Blog</h1>
-                    <p class="text-textmuted text-sm font-light max-w-xl mx-auto">Expert articles on Python, AI, digital marketing & web development – tailored for Madhya Pradesh businesses.</p>
-                    <!-- Search Bar -->
-                    <div class="mt-10 relative max-w-xl mx-auto">
-                        <i data-lucide="search" class="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-textmuted"></i>
-                        <input type="text" id="blogSearch" placeholder="Search articles or FAQs..." class="w-full pl-12 pr-6 py-4 rounded-full glass-panel border border-textmain/20 text-textmain placeholder:text-textmuted/50 focus:outline-none focus:border-accent text-sm">
-                    </div>
-                </div>
-
-                <!-- Blog Posts Grid (will be filled by generator) -->
-                <section id="blog-posts" class="mb-24">
-                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Latest Articles</h2>
-                    <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-        <div class="tilt-wrapper blog-card gsap-reveal">
-            <div class="rgb-card">
-                <a href="posts/2026-03-12-serviceswebdevelopmentunitedstates.html" class="rgb-content block">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-[8px] font-bold text-tech uppercase tracking-widest">Blog</span>
-                        <span class="text-[8px] text-textmuted">2026-03-12</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-textmain mb-2 leading-tight">Services Web Development United States</h3>
-                    <p class="text-xs text-textmuted font-light flex-1">
-
-
-    
-    
-    
-    
-    
-    
-    
-    Services Web Development United States | SIDDHI AI Blog
-    
-    
-    
-    
-    
-    
-    
-        /* ======…</p>
-                    <div class="mt-4 flex flex-wrap gap-1">
-                        <span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#web development</span><span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#united states</span><span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#web developer</span>
-                    </div>
-                    <span class="mt-4 text-[9px] text-tech hover:text-accent transition-colors self-start uppercase tracking-widest font-bold">Read more →</span>
+    <footer class="py-12 border-t border-textmain/10 bg-obsidian">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <span class="font-extrabold text-2xl tracking-tighter text-textmain mb-6 block">SIDDHI <span class="text-accent">AI</span></span>
+            <div class="flex justify-center gap-6 mb-6">
+                <a href="https://github.com/CodeWander-666-github" class="text-textmuted hover:text-accent">
+                    <i data-lucide="github" class="w-5 h-5"></i>
                 </a>
             </div>
+            <p class="text-[9px] text-textmuted uppercase tracking-widest">&copy; 2017-2026 SIDDHI AI. All rights reserved.</p>
         </div>
-        
-        <div class="tilt-wrapper blog-card gsap-reveal">
-            <div class="rgb-card">
-                <a href="posts/2026-03-12-professionalwebdevelopmentunitedstates.html" class="rgb-content block">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-[8px] font-bold text-tech uppercase tracking-widest">Blog</span>
-                        <span class="text-[8px] text-textmuted">2026-03-12</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-textmain mb-2 leading-tight">Professional Web Development United States</h3>
-                    <p class="text-xs text-textmuted font-light flex-1">
+    </footer>
 
-
-    
-    
-    
-    
-    
-    
-    
-    Professional Web Development United States | SIDDHI AI Blog
-    
-    
-    
-    
-    
-    
-    
-        /* ==…</p>
-                    <div class="mt-4 flex flex-wrap gap-1">
-                        <span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#web development</span><span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#united states</span><span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#web dev</span>
-                    </div>
-                    <span class="mt-4 text-[9px] text-tech hover:text-accent transition-colors self-start uppercase tracking-widest font-bold">Read more →</span>
-                </a>
-            </div>
-        </div>
-        </div>
-                    <h3 class="text-lg font-bold text-textmain mb-2 leading-tight">Professional Web Development United States</h3>
-                    <p class="text-xs text-textmuted font-light flex-1">
-
-
-    
-    
-    
-    
-    
-    
-    
-    Professional Web Development United States | SIDDHI AI Blog
-    
-    
-    
-    
-    
-    
-    
-        /* ==…</p>
-                    <div class="mt-4 flex flex-wrap gap-1">
-                        <span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#web development</span><span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#united states</span><span class="text-[7px] bg-accent/10 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider">#web dev</span>
-                    </div>
-                    <span class="mt-4 text-[9px] text-tech hover:text-accent transition-colors self-start uppercase tracking-widest font-bold">Read more →</span>
-                </a>
-            </div>
-        </div>
-        </div>
-                    <div id="noPostsMsg" class="hidden text-center py-20 text-textmuted text-sm italic">No matching articles found.</div>
-                </section>
-
-                <!-- FAQ Section (static) -->
-                <section id="faq" class="mb-24">
-                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Frequently Asked Questions</h2>
-                    <div id="faqContainer" class="max-w-3xl mx-auto glass-panel rounded-2xl p-6 md:p-10">
-                        <!-- FAQs will be inserted by JavaScript (copy from your earlier blog version) -->
-                    </div>
-                    <div id="noFaqMsg" class="hidden text-center py-10 text-textmuted text-sm italic">No matching FAQs.</div>
-                </section>
-
-                <!-- Contact CTA -->
-                <div class="text-center mt-16">
-                    <p class="text-textmuted text-sm mb-4">Need a custom solution?</p>
-                    <a href="../index.html#contact" class="inline-flex bg-accent text-obsidian px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
-                        <span class="btn-text-content">Contact our team</span>
-                        <div class="eyes-wrapper">...</div>
-                    </a>
-                </div>
-            </div>
-        </main>
-
-        <!-- FOOTER (copy from main, links adjusted) -->
-        <footer class="py-12 border-t border-textmain/10 bg-obsidian interactive-ui">
-            <!-- ... -->
-            <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-[9px] text-textmuted uppercase tracking-[0.2em] font-bold">
-                <a href="../policy.html" class="hover:text-accent">Terms & Conditions</a>
-                <span class="text-textmain/20">|</span>
-                <a href="../policy.html" class="hover:text-accent">Privacy Policy</a>
-            </div>
-            <p class="text-[9px] text-textmuted uppercase tracking-[0.3em] font-bold">&copy; 2017-2026. Business Web Solutions.</p>
-        </footer>
-    </div>
-
-    <!-- Exit button (unused) -->
-    <button id="exit-interactive" class="fixed top-8 right-8 ...">Exit 3D Mode</button>
-
-    <!-- Hidden SEO Keywords -->
-    <div style="display:none;">python training Bhopal, digital marketing Indore, ...</div>
-
-    <!-- JSON‑LD Schema (will be updated by generator) -->
-    <script type="application/ld+json" id="blogSchema">{
-  "@context": "https://schema.org",
-  "@type": "Blog",
-  "name": "SIDDHI AI Blog",
-  "description": "Expert articles on Python, digital marketing, web development, and AI solutions.",
-  "url": "https://siddhiai.com/blog/",
-  "blogPost": [
-    {
-      "@type": "BlogPosting",
-      "headline": "Services Web Development United States",
-      "datePublished": "2026-03-12",
-      "url": "https://siddhiai.com/blog/posts/2026-03-12-serviceswebdevelopmentunitedstates.html"
-    },
-    {
-      "@type": "BlogPosting",
-      "headline": "Professional Web Development United States",
-      "datePublished": "2026-03-12",
-      "url": "https://siddhiai.com/blog/posts/2026-03-12-professionalwebdevelopmentunitedstates.html"
-    }
-  ]
-}</script>
-
-    <!-- JS Module (paste your full Three.js/theme code here, but remove any hardcoded blogPosts) -->
-    <script type="module">
-        // Paste your entire <script type="module"> from main index.html here,
-        // but DELETE the blogPosts array and the renderBlog function that uses it.
-        // Keep the 3D background, theme switching, mobile menu, and the search/filter logic.
-        // Example filter:
-        const searchInput = document.getElementById('blogSearch');
-        const postsContainer = document.getElementById('postsContainer');
-        searchInput.addEventListener('input', (e) => {
-            const val = e.target.value.toLowerCase();
-            const cards = document.querySelectorAll('.blog-card');
-            cards.forEach(card => {
-                const text = card.innerText.toLowerCase();
-                card.style.display = text.includes(val) ? 'block' : 'none';
-            });
-        });
+    <script>
+        lucide.createIcons();
     </script>
 </body>
 </html>
