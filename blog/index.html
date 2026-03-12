@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="google-site-verification" content="mXzGHeQy9yGNuw8JTuzgXdDUn-gUcj4C65Jt83rcK9A" />
+    <meta name="description" content="SIDDHI AI Blog: expert articles on Python, AI, digital marketing & web development – tailored for Madhya Pradesh businesses.">
+    <meta name="keywords" content="python tutorial, digital marketing blog, web development tips, AI blog, SEO guide, Bhopal, Indore">
+    <meta name="author" content="SIDDHI AI">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://siddhiai.com/blog">
+    <meta property="og:title" content="SIDDHI AI Blog – Insights & Tutorials">
+    <meta property="og:description" content="In‑depth articles on Python, AI, digital marketing, and web development.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://siddhiai.com/blog">
+    <meta property="og:image" content="https://siddhiai.com/og-blog.jpg">
+    <meta name="geo.region" content="IN-MP">
+    <meta name="geo.placename" content="Madhya Pradesh">
+    <title>SIDDHI AI | Blog</title>
+    <!-- Favicon (same as main) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cfilter id='glow' x='-50%25' y='-50%25' width='200%25' height='200%25'%3E%3CfeGaussianBlur stdDeviation='5' result='blur'/%3E%3CfeMerge%3E%3CfeMergeNode in='blur'/%3E%3CfeMergeNode in='blur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect width='100' height='100' fill='%23020203' rx='15'/%3E%3Ctext x='50' y='75' font-family='sans-serif' font-size='72' font-style='italic' font-weight='normal' fill='%23E5B769' text-anchor='middle' filter='url(%23glow)'%3EAI%3C/text%3E%3Ctext x='50' y='75' font-family='sans-serif' font-size='72' font-style='italic' font-weight='normal' fill='%23FFF8DC' text-anchor='middle'%3EAI%3C/text%3E%3C/svg%3E">
+    <!-- Tailwind, Icons, GSAP, Fonts (exactly as in main index) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* ========== PASTE EXACTLY THE SAME <style> BLOCK FROM YOUR MAIN index.html ========== */
+        /* All CSS variables, RGB cards, mobile menu, creepy eyes, etc. */
+        :root { /* ... */ }
+        /* ... (copy everything from your main index) ... */
+    </style>
+    <script>
+        tailwind.config = { /* ... same as main ... */ };
+        function changeTheme(theme) { /* ... */ }
+    </script>
+    <!-- Shaders & import map (same as main) -->
+    <script id="vertexShader" type="x-shader/x-vertex"> /* ... */ </script>
+    <script id="fragmentShader" type="x-shader/x-fragment"> /* ... */ </script>
+    <script type="importmap"> /* ... */ </script>
+</head>
+<body>
+    <!-- 3D Canvas & Overlay -->
+    <canvas id="webgl-canvas"></canvas>
+    <div class="ambient-overlay"></div>
+
+    <!-- MAIN UI LAYER -->
+    <div id="ui-layer" class="relative z-10 w-full">
+
+        <!-- NAVBAR (identical to main, but links adjusted) -->
+        <nav class="fixed w-full z-50 transition-all duration-300 interactive-ui backdrop-blur-md border-b border-textmain/10 bg-obsidian/40" id="navbar">
+            <div class="max-w-7xl mx-auto px-6 lg:px-12">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="cpu" class="text-accent w-6 h-6"></i>
+                        <span class="font-extrabold text-xl tracking-tighter text-textmain">SIDDHI <span class="text-accent">AI</span></span>
+                    </div>
+                    <div class="hidden md:flex items-center space-x-6">
+                        <a href="../index.html" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Home</a>
+                        <a href="#blog-posts" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Articles</a>
+                        <a href="#faq" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">FAQs</a>
+                        <!-- Theme toggles (same) -->
+                        <div class="flex items-center gap-2 ml-4 border-l border-textmuted/30 pl-6">
+                            <button onclick="changeTheme('dark')" class="w-4 h-4 rounded-full bg-[#020203] border-2 border-gray-500" title="Dark Theme"></button>
+                            <button onclick="changeTheme('rich')" class="w-4 h-4 rounded-full bg-[#1a0b2e] border-2 border-[#d4af37]" title="Rich Theme"></button>
+                            <button onclick="changeTheme('sunny')" class="w-4 h-4 rounded-full bg-[#e0f2fe] border-2 border-[#f59e0b]" title="Sunny Theme"></button>
+                        </div>
+                    </div>
+                    <a href="../index.html#contact" class="hidden md:flex bg-accent text-obsidian px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
+                        <span class="btn-text-content">Start Project</span>
+                        <div class="eyes-wrapper">...</div>
+                    </a>
+                    <!-- Mobile menu toggle -->
+                    <button class="mobile-menu-toggle md:hidden" id="mobileMenuToggle">...</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile menu overlay (same) -->
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay">...</div>
+
+        <!-- ========== BLOG CONTENT ========== -->
+        <main class="pt-32 pb-20 interactive-ui">
+            <div class="max-w-7xl mx-auto px-6">
+                <!-- Blog Header with Search -->
+                <div class="text-center max-w-3xl mx-auto mb-16 gsap-reveal">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-textmain/10 bg-textmain/5 mb-4">
+                        <i data-lucide="book-open" class="w-3 h-3 text-tech"></i>
+                        <span class="text-[9px] font-bold text-tech uppercase tracking-widest">Knowledge Base</span>
+                    </div>
+                    <h1 class="font-serif text-5xl md:text-6xl text-textmain mb-6">The <span class="gold-gradient italic">Insights</span> Blog</h1>
+                    <p class="text-textmuted text-sm font-light max-w-xl mx-auto">Expert articles on Python, AI, digital marketing & web development – tailored for Madhya Pradesh businesses.</p>
+                    <!-- Search Bar -->
+                    <div class="mt-10 relative max-w-xl mx-auto">
+                        <i data-lucide="search" class="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-textmuted"></i>
+                        <input type="text" id="blogSearch" placeholder="Search articles or FAQs..." class="w-full pl-12 pr-6 py-4 rounded-full glass-panel border border-textmain/20 text-textmain placeholder:text-textmuted/50 focus:outline-none focus:border-accent text-sm">
+                    </div>
+                </div>
+
+                <!-- Blog Posts Grid (populated by Python script) -->
+                <section id="blog-posts" class="mb-24">
+                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Latest Articles</h2>
+                    <div id="postsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+                        <!-- POSTS WILL BE INSERTED HERE BY GENERATOR -->
+                    </div>
+                    <div id="noPostsMsg" class="hidden text-center py-20 text-textmuted text-sm italic">No matching articles found.</div>
+                </section>
+
+                <!-- FAQ Section (static, same as earlier) -->
+                <section id="faq" class="mb-24">
+                    <h2 class="font-serif text-3xl text-textmain mb-10 border-b border-textmain/10 pb-4">Frequently Asked Questions</h2>
+                    <div id="faqContainer" class="max-w-3xl mx-auto glass-panel rounded-2xl p-6 md:p-10">
+                        <!-- FAQs will be inserted by JavaScript (copy from your earlier blog version) -->
+                    </div>
+                    <div id="noFaqMsg" class="hidden text-center py-10 text-textmuted text-sm italic">No matching FAQs.</div>
+                </section>
+
+                <!-- Contact CTA -->
+                <div class="text-center mt-16">
+                    <p class="text-textmuted text-sm mb-4">Need a custom solution?</p>
+                    <a href="../index.html#contact" class="inline-flex bg-accent text-obsidian px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] btn-creepy">
+                        <span class="btn-text-content">Contact our team</span>
+                        <div class="eyes-wrapper">...</div>
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <!-- FOOTER (identical to main) -->
+        <footer class="py-12 border-t border-textmain/10 bg-obsidian interactive-ui">
+            <div class="max-w-7xl mx-auto px-6 text-center">
+                <span class="font-extrabold text-2xl tracking-tighter text-textmain mb-6 block">SIDDHI <span class="text-accent">AI</span></span>
+                <div class="flex flex-wrap items-center justify-center gap-6 mb-8">
+                    <a href="https://github.com/CodeWander-666-github" target="_blank" class="text-textmuted hover:text-accent"><i data-lucide="github" class="w-6 h-6"></i></a>
+                    <a href="#" class="text-textmuted hover:text-accent"><i data-lucide="chrome" class="w-6 h-6"></i></a>
+                    <div class="flex items-center gap-1 text-textmuted"><i data-lucide="badge-check" class="w-5 h-5 text-accent"></i><span class="text-[10px] font-bold uppercase">GST</span></div>
+                    <div class="flex items-center gap-1 text-textmuted"><i data-lucide="badge-check" class="w-5 h-5 text-accent"></i><span class="text-[10px] font-bold uppercase">Udyam</span></div>
+                </div>
+                <div class="flex flex-wrap items-center justify-center gap-4 mb-6 text-[9px] text-textmuted uppercase tracking-[0.2em] font-bold">
+                    <a href="../policy.html" class="hover:text-accent">Terms & Conditions</a>
+                    <span class="text-textmain/20">|</span>
+                    <a href="../policy.html" class="hover:text-accent">Privacy Policy</a>
+                </div>
+                <p class="text-[9px] text-textmuted uppercase tracking-[0.3em] font-bold">&copy; 2017-2026. Business Web Solutions.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Exit interactive button (unused) -->
+    <button id="exit-interactive" class="fixed top-8 right-8 ...">...</button>
+
+    <!-- Hidden SEO Keywords (same) -->
+    <div style="display:none;">python training Bhopal, digital marketing Indore, ...</div>
+
+    <!-- JSON‑LD structured data (updated by script) -->
+    <script type="application/ld+json" id="blogSchema"> { } </script>
+
+    <!-- ES MODULE SCRIPT (includes 3D background, theme switching, search/filter) -->
+    <script type="module">
+        // ========== PASTE THE EXACT <script type="module"> FROM YOUR MAIN index.html ==========
+        // But REMOVE the hardcoded blogPosts array and the renderBlog function that uses it.
+        // Keep the 3D background, theme switching, mobile menu, creepy eyes, and the search/filter logic that works on static cards.
+        // Also keep the FAQ toggle functionality.
+        // Example filter:
+        const searchInput = document.getElementById('blogSearch');
+        const posts = document.querySelectorAll('.blog-card');
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            posts.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                card.style.display = text.includes(val) ? 'block' : 'none';
+            });
+        });
+        // ... (rest of the Three.js code unchanged)
+    </script>
+</body>
+  </html>
