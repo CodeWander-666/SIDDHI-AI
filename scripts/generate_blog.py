@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-SIDDHI AI - Automated Blog Generator using Zhipu AI (zai-sdk)
-Produces unique, SEO-optimized articles daily.
+SIDDHI AI - Automated Blog Generator (zai-sdk)
+Generates unique, SEO-optimized articles daily on diverse topics.
 """
 
 import os
@@ -13,9 +13,9 @@ import logging
 import sys
 import time
 from string import punctuation
-from typing import List, Dict, Tuple, Optional, Any
+from typing import List, Tuple, Optional
 
-# Correct SDK import
+# Correct SDK for Zhipu
 try:
     from zai import ZhipuAiClient
 except ImportError:
@@ -28,17 +28,17 @@ BLOG_DIR = "blog"
 POSTS_DIR = os.path.join(BLOG_DIR, "posts")
 INDEX_FILE = os.path.join(BLOG_DIR, "index.html")
 LOG_FILE = "blog_generator.log"
-INDEX_HTML_PATH = "index.html"          # to extract keywords
+INDEX_HTML_PATH = "index.html"          # to extract hidden keywords
 
 # Zhipu API settings
 ZHIPU_MODEL = "glm-5"                    # or "glm-4" if needed
-MAX_TOKENS = 65536                       # as per docs
+MAX_TOKENS = 65536
 TEMPERATURE = 0.7
 REQUEST_TIMEOUT = 30
 MAX_RETRIES = 3
 RETRY_DELAY = 2
 
-# Logging setup
+# Logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -48,6 +48,28 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+# -------------------- EXPANDED TOPIC CATEGORIES --------------------
+# These are the services/keywords you want to cover.
+# The script will pick one at random each day.
+TOPICS = [
+    # Core services
+    "Python Training", "Digital Marketing", "SEO Services", "Web Development",
+    "AI Solutions", "E-commerce Website", "Content Marketing", "Social Media Marketing",
+    "Stock Market Analysis", "Mobile App Development", "Cloud Consulting", "3D Web Design",
+    # Local business
+    "Local SEO", "Small Business Websites", "Google My Business Optimization",
+    # Technology trends
+    "AI in Business", "Machine Learning Applications", "Cybersecurity Basics",
+    "DevOps Practices", "Web Performance Optimization", "Progressive Web Apps",
+    # Career & learning
+    "Python Career Guide", "Data Science with Python", "Freelancing Tips",
+    "Remote Work Tools", "Tech Certifications",
+    # Corporate & news
+    "TCS Hiring Updates", "ISL 2026 News", "Gemini AI Features", "Stock Market Trends",
+    # How‑to
+    "How to Build a Website", "How to Start a Blog", "How to Use Google Colab"
+]
 
 # -------------------- LOCATION DATA --------------------
 GLOBAL_LOCATIONS = ["United States", "Canada", "United Kingdom", "Australia", "New Zealand", "Ireland"]
@@ -90,11 +112,11 @@ def safe_write_file(filepath: str, content: str) -> bool:
         logger.error(f"Error writing {filepath}: {e}")
         return False
 
-# -------------------- KEYWORD EXTRACTION --------------------
+# -------------------- KEYWORD EXTRACTION (from index.html) --------------------
 def extract_keywords_from_index() -> List[str]:
     content = safe_read_file(INDEX_HTML_PATH)
     if not content:
-        logger.warning("index.html not found; using defaults.")
+        logger.warning("index.html not found; using default keywords.")
         return []
     pattern = r'<div style="display:none;">(.*?)</div>'
     match = re.search(pattern, content, re.DOTALL)
@@ -108,12 +130,12 @@ def extract_keywords_from_index() -> List[str]:
         if kw not in seen:
             seen.add(kw)
             unique.append(kw)
-    logger.info(f"Extracted {len(unique)} keywords")
+    logger.info(f"Extracted {len(unique)} keywords from index.html")
     return unique
 
+# These are used to enrich content, not as primary topics.
 MASTER_KEYWORDS = extract_keywords_from_index() or [
-    "learn python for beginners", "digital marketing agency in india", "web development",
-    "SEO services", "AI solutions", "stock market analysis", "Python training"
+    "learn python", "digital marketing", "web development", "SEO", "AI"
 ]
 
 # -------------------- LOCATION SELECTION --------------------
@@ -132,12 +154,12 @@ def select_location() -> Tuple[str, str]:
         state = random.choice(list(STATES.keys()))
         city = random.choice(STATES[state])
         return f"{city}, {state}", "city"
-    else:
+    else:  # area
         city = random.choice(list(AREAS.keys()))
         area = random.choice(AREAS[city])
         return f"{area}, {city}", "area"
 
-# -------------------- ZHIPU AI CONTENT GENERATION --------------------
+# -------------------- ZHIPU AI CLIENT --------------------
 def init_zhipu_client() -> Optional[ZhipuAiClient]:
     api_key = os.environ.get("ZHIPU_API_KEY")
     if not api_key:
@@ -165,11 +187,10 @@ def generate_content_with_zhipu(prompt: str, max_tokens: int = MAX_TOKENS) -> Op
                     {"role": "system", "content": "You are an expert SEO content writer for SIDDHI AI, a premier digital marketing and web development agency. Write in a professional, informative, and engaging style. Use proper HTML formatting with h2, h3, p, ul, li tags. Include relevant keywords naturally. Make content unique, valuable, and actionable."},
                     {"role": "user", "content": prompt}
                 ],
-                thinking={"type": "enabled"},      # enable deep thinking if desired
+                thinking={"type": "enabled"},
                 max_tokens=max_tokens,
                 temperature=TEMPERATURE
             )
-            # Extract the content
             content = response.choices[0].message.content
             logger.info(f"✅ Generated {len(content)} chars")
             return content
@@ -180,6 +201,7 @@ def generate_content_with_zhipu(prompt: str, max_tokens: int = MAX_TOKENS) -> Op
     return None
 
 def generate_fallback_content(primary_kw: str, location: str) -> str:
+    """Fallback template in case API fails."""
     year = datetime.datetime.now().year
     return f"""
 <h2>Introduction to {primary_kw} in {location}</h2>
@@ -205,6 +227,7 @@ def generate_fallback_content(primary_kw: str, location: str) -> str:
 </div>
 """
 
+# -------------------- ARTICLE GENERATION --------------------
 def generate_article(primary_kw: str, location: str) -> Tuple[str, str, str]:
     year = datetime.datetime.now().year
     current_date = datetime.datetime.now().strftime("%B %d, %Y")
@@ -220,39 +243,65 @@ def generate_article(primary_kw: str, location: str) -> Tuple[str, str, str]:
     title = random.choice(titles)
     meta_description = f"Looking for expert {primary_kw} in {location}? SIDDHI AI provides top-rated {primary_kw.lower()} solutions. Free consultation! ⭐⭐⭐⭐⭐"
 
-    # Build prompt
+    # Build a highly explicit prompt
     prompt = f"""
-Write a comprehensive, SEO-optimized blog article about "{primary_kw} in {location}" for SIDDHI AI website.
+You are an expert SEO content writer for SIDDHI AI, a premier digital marketing and web development agency headquartered in Madhya Pradesh, India.
 
-## ARTICLE REQUIREMENTS:
-- Title: {title}
-- Target Location: {location}
-- Primary Keyword: {primary_kw}
-- Year: {year}
-- Tone: Professional, informative, engaging
-- Length: 1200-1500 words
-- Format: Use proper HTML tags (h2 for sections, h3 for subsections, p for paragraphs, ul/li for lists)
+Your task: Write a comprehensive, 1200‑1500 word blog article about **{primary_kw} in {location}** for the SIDDHI AI website.
 
-## STRUCTURE:
-1. **Engaging Introduction** – Hook the reader, introduce the topic, mention SIDDHI AI's expertise.
-2. **Why {location} is Ideal for {primary_kw}** – Local market insights, trends, opportunities.
-3. **Key Benefits of Professional {primary_kw}** – At least 5-6 benefits with explanations.
-4. **SIDDHI AI's {primary_kw} Services in {location}** – Detailed service offerings.
-5. **Success Stories/Case Studies** – Real or illustrative examples of results.
-6. **Expert Tips for Choosing {primary_kw} Services** – Practical advice for readers.
-7. **Frequently Asked Questions** – 5-6 FAQs with answers.
-8. **Strong Call-to-Action** – Encourage consultation.
+The article must be factual, helpful, and focused on the specific location: **{location}**. Do not confuse this location with any other place.
 
-## SEO REQUIREMENTS:
-- Naturally incorporate these keywords: {primary_kw}, {location}, {primary_kw} in {location}, best {primary_kw} services.
-- Include location-specific terms and local landmarks/areas where relevant.
-- Write unique, valuable content that helps readers make informed decisions.
-- Include statistics or data points where appropriate.
+## Article Structure (use HTML tags exactly as shown):
+<h2>Introduction to {primary_kw} in {location}</h2>
+<p>... (2-3 paragraphs introducing the topic and SIDDHI AI's expertise in this location) ...</p>
 
-## BRAND VOICE:
-- SIDDHI AI is a premier digital marketing and web development agency.
-- We emphasize: expertise, results, innovation, client success.
-- Professional but approachable; confident but not arrogant.
+<h2>Why {location} is a Prime Destination for {primary_kw}</h2>
+<p>... (discuss local market trends, business growth, demand for {primary_kw} in {location}) ...</p>
+
+<h2>Key Benefits of Professional {primary_kw} in {location}</h2>
+<ul>
+    <li><strong>Local Market Expertise:</strong> ... (explain) </li>
+    <li><strong>Customized Solutions:</strong> ... </li>
+    <li><strong>Proven Results:</strong> ... </li>
+    <li><strong>Cost-Effective:</strong> ... </li>
+    <li><strong>24/7 Support:</strong> ... </li>
+</ul>
+
+<h2>SIDDHI AI's {primary_kw} Services in {location}</h2>
+<ul>
+    <li><strong>Complete {primary_kw} Packages:</strong> ... </li>
+    <li><strong>Custom Strategy Development:</strong> ... </li>
+    <li><strong>Implementation & Management:</strong> ... </li>
+    <li><strong>Analytics & Reporting:</strong> ... </li>
+    <li><strong>Training & Workshops:</strong> ... </li>
+</ul>
+
+<h2>Success Stories in {location}</h2>
+<p>... (describe how SIDDHI AI helped a local business in {location} achieve great results) ...</p>
+
+<h2>Frequently Asked Questions About {primary_kw} in {location}</h2>
+<div>
+    <h3>❓ How much does {primary_kw} cost in {location}?</h3>
+    <p>...</p>
+    <h3>❓ Why choose SIDDHI AI for {primary_kw} in {location}?</h3>
+    <p>...</p>
+    <h3>❓ How quickly can I see results?</h3>
+    <p>...</p>
+    <h3>❓ Do you serve specific areas within {location}?</h3>
+    <p>...</p>
+    <h3>❓ What industries do you specialize in?</h3>
+    <p>...</p>
+</div>
+
+<h2>Get Started with SIDDHI AI in {location}</h2>
+<p>Ready to grow your business with expert {primary_kw} in {location}? Contact us today for a free consultation.</p>
+
+## Important Guidelines:
+- Use natural, engaging language.
+- Include relevant local landmarks, neighborhoods, or business districts in {location} where appropriate.
+- The primary keyword is "{primary_kw} in {location}". Use it naturally 3-4 times.
+- Ensure all information is accurate for {location}. Do not mix in details from other cities.
+- The tone should be professional yet approachable, reflecting SIDDHI AI's brand.
 
 Generate the complete article content with proper HTML formatting.
 """
@@ -263,10 +312,10 @@ Generate the complete article content with proper HTML formatting.
         logger.warning("Using fallback content")
         body_content = generate_fallback_content(primary_kw, location)
 
-    # Add related posts
+    # Add related posts section
     related = generate_related_posts(f"{slugify(primary_kw)}-{slugify(location)}.html")
 
-    # Complete HTML template (same as before, with your design)
+    # Complete HTML template with your existing design
     html = f"""<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
@@ -374,6 +423,7 @@ def generate_related_posts(current_post_filename: str) -> str:
     <ul class="space-y-2">{links}</ul>
 </div>"""
 
+# -------------------- BLOG INDEX GENERATION --------------------
 def generate_blog_index() -> str:
     posts = []
     if not os.path.exists(POSTS_DIR):
@@ -520,9 +570,11 @@ def main():
 
     try:
         os.makedirs(POSTS_DIR, exist_ok=True)
-        primary_kw = random.choice(MASTER_KEYWORDS)
+
+        # Pick a random topic from the expanded list
+        primary_kw = random.choice(TOPICS)
         location, loc_type = select_location()
-        logger.info(f"📝 Keyword: {primary_kw}")
+        logger.info(f"📝 Topic: {primary_kw}")
         logger.info(f"📍 Location: {location} ({loc_type})")
 
         html, title, meta = generate_article(primary_kw, location)
