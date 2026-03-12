@@ -399,6 +399,8 @@
                         <a href="#benefits" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Why Us</a>
                         <a href="#architectures" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Services</a>
                         <a href="#global-reach" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Global Reach</a>
+                        <!-- NEW: Blog & Insights link -->
+                        <a href="/blog" class="text-[10px] uppercase tracking-[0.2em] font-bold text-textmuted hover:text-accent transition-colors">Blog&Insights</a>
                         
                         <!-- THEME TOGGLES -->
                         <div class="flex items-center gap-2 ml-4 border-l border-textmuted/30 pl-6">
@@ -431,6 +433,8 @@
             <a href="#benefits" class="mobile-menu-item" onclick="document.getElementById('mobileMenuOverlay').classList.remove('open');">Why Us</a>
             <a href="#architectures" class="mobile-menu-item" onclick="document.getElementById('mobileMenuOverlay').classList.remove('open');">Services</a>
             <a href="#global-reach" class="mobile-menu-item" onclick="document.getElementById('mobileMenuOverlay').classList.remove('open');">Global Reach</a>
+            <!-- NEW: Blog & Insights mobile link -->
+            <a href="/blog" class="mobile-menu-item" onclick="document.getElementById('mobileMenuOverlay').classList.remove('open');">Blog&Insights</a>
             <div class="mobile-theme-toggles">
                 <button onclick="changeTheme('dark'); document.getElementById('mobileMenuOverlay').classList.remove('open');" class="w-8 h-8 rounded-full bg-[#020203] border-2 border-gray-500" title="Dark Theme"></button>
                 <button onclick="changeTheme('rich'); document.getElementById('mobileMenuOverlay').classList.remove('open');" class="w-8 h-8 rounded-full bg-[#1a0b2e] border-2 border-[#d4af37]" title="Rich Theme"></button>
@@ -625,6 +629,25 @@
             </div>
             <div class="marquee-container mb-8 pl-10"><div class="marquee-track" id="testimonial-track-1"></div></div>
             <div class="marquee-container pr-10"><div class="marquee-track reverse" id="testimonial-track-2"></div></div>
+        </section>
+
+        <!-- NEW: BLOG SECTION: INSIGHTS & ARTICLES -->
+        <section id="blog-section" class="py-32 relative interactive-ui bg-obsidian/40 border-y border-textmain/10">
+            <div class="max-w-7xl mx-auto px-6 text-center">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-tech/30 bg-tech/5 mb-4">
+                    <i data-lucide="book-open" class="w-3 h-3 text-tech"></i>
+                    <span class="text-[9px] font-bold text-tech uppercase tracking-widest">Knowledge Hub</span>
+                </div>
+                <h2 class="font-serif text-4xl md:text-5xl text-textmain mb-6">Blog & <span class="gold-gradient italic">Insights.</span></h2>
+                <p class="max-w-2xl mx-auto text-textmuted text-sm font-light leading-relaxed mb-10">Dive into our latest articles on Python, AI, digital marketing, and web development. Expert tips, tutorials, and trends to accelerate your business growth – all in one place.</p>
+                <a href="/blog" class="inline-flex bg-accent text-obsidian px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:bg-textmain shadow-[0_0_20px_rgba(var(--accent-rgb),0.2)] btn-creepy">
+                    <span class="btn-text-content">Explore Articles</span>
+                    <div class="eyes-wrapper">
+                        <div class="creepy-eye"><div class="creepy-pupil"></div></div>
+                        <div class="creepy-eye"><div class="creepy-pupil"></div></div>
+                    </div>
+                </a>
+            </div>
         </section>
 
         <!-- Form Section with Web3Forms integration -->
@@ -1511,4 +1534,4 @@
         });
     </script>
 </body>
-</html>
+    </html>
