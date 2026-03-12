@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-SIDDHI AI - Enhanced Automated Blog Generator
-Produces high-quality, unique, SEO-optimized blog posts daily.
+SIDDHI AI - AI-Powered Blog Generator using Zhipu API
+Produces unique, high-quality, SEO-optimized blog posts daily.
 """
 
 import os
@@ -12,8 +12,17 @@ import requests
 import logging
 import sys
 import time
+import json
 from string import punctuation
-from typing import List, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Any
+from pathlib import Path
+
+# Import ZhipuAI SDK
+try:
+    from zhipuai import ZhipuAI
+except ImportError:
+    print("Please install zhipuai: pip install zhipuai")
+    sys.exit(1)
 
 # -------------------- CONFIGURATION --------------------
 SITE_URL = "https://siddhiai-welcome.vercel.app"
@@ -25,9 +34,12 @@ LOG_FILE = "blog_generator.log"
 # Path to your main index.html (to extract keywords)
 INDEX_HTML_PATH = "index.html"
 
-# API endpoints
-DATAMUSE_API = "https://api.datamuse.com/words"
-REQUEST_TIMEOUT = 10
+# Zhipu API Configuration
+ZHIPU_API_KEY = os.environ.get("ZHIPU_API_KEY", "your-api-key-here")
+ZHIPU_MODEL = "glm-4"  # or "glm-5" if you have access
+
+# API settings
+REQUEST_TIMEOUT = 30
 MAX_RETRIES = 3
 RETRY_DELAY = 2
 
@@ -67,35 +79,6 @@ def slugify(text: str) -> str:
     text = re.sub(rf"[{re.escape(punctuation)}]", "", text)
     text = re.sub(r"-+", "-", text)
     return text.strip("-")
-
-def fetch_with_retry(url: str, params: dict = None) -> Optional[requests.Response]:
-    """Fetch URL with exponential backoff retry logic."""
-    for attempt in range(MAX_RETRIES):
-        try:
-            response = requests.get(url, params=params, timeout=REQUEST_TIMEOUT)
-            response.raise_for_status()
-            return response
-        except requests.exceptions.RequestException as e:
-            logger.warning(f"Request failed (attempt {attempt + 1}/{MAX_RETRIES}): {e}")
-            if attempt < MAX_RETRIES - 1:
-                time.sleep(RETRY_DELAY * (2 ** attempt))
-            else:
-                logger.error(f"All retries failed for URL: {url}")
-                return None
-
-def get_lsi_keywords(phrase: str, max_results: int = 5) -> List[str]:
-    """Fetch semantically related keywords from Datamuse API."""
-    try:
-        params = {'ml': phrase, 'max': max_results}
-        response = fetch_with_retry(DATAMUSE_API, params=params)
-        if response and response.status_code == 200:
-            data = response.json()
-            keywords = [item['word'] for item in data if 'word' in item]
-            logger.info(f"Found {len(keywords)} LSI keywords for '{phrase}'")
-            return keywords
-    except Exception as e:
-        logger.error(f"Error fetching LSI keywords: {e}")
-    return []
 
 def safe_read_file(filepath: str) -> Optional[str]:
     try:
@@ -170,125 +153,90 @@ def select_location() -> Tuple[str, str]:
         area = random.choice(AREAS[city])
         return f"{area}, {city}", "area"
 
-# -------------------- CONTENT GENERATION --------------------
-def generate_intro(primary_kw: str, location: str, lsi_keywords: List[str]) -> str:
-    lsi_phrase = ", ".join(lsi_keywords[:3]) if lsi_keywords else primary_kw
-    year = datetime.datetime.now().year
-    return f"""<p>Are you searching for the best <strong>{primary_kw} in {location}</strong>? You've come to the right place. At <strong>SIDDHI AI</strong>, we specialize in delivering world-class {primary_kw} services tailored to businesses and individuals in {location}. With our proven track record and cutting-edge technology, we've helped hundreds of clients achieve their digital goals.</p>
+# -------------------- ZHIPU AI CONTENT GENERATION --------------------
+def init_zhipu_client() -> Optional[ZhipuAI]:
+    """Initialize ZhipuAI client with API key."""
+    try:
+        client = ZhipuAI(api_key=ZHIPU_API_KEY)
+        logger.info("✅ ZhipuAI client initialized successfully")
+        return client
+    except Exception as e:
+        logger.error(f"❌ Failed to initialize ZhipuAI client: {e}")
+        return None
 
-<p>In this comprehensive guide, we'll explore everything you need to know about {primary_kw} in {location}, including local trends, pricing, expert tips, and how SIDDHI AI can help you succeed in {year}.</p>"""
-
-def generate_why_location(primary_kw: str, location: str, lsi_keywords: List[str]) -> str:
-    lsi_phrase = ", ".join(lsi_keywords[:3]) if lsi_keywords else primary_kw
-    return f"""<h2>Why {location} is a Prime Destination for {primary_kw.title()}</h2>
-<p>{location} has emerged as a thriving hub for digital innovation and business growth. With a rapidly expanding economy and increasing demand for professional {primary_kw.lower()} services, now is the ideal time to invest in {primary_kw}. Local businesses in {location} are leveraging {lsi_phrase} to gain competitive advantages and reach wider audiences.</p>
-
-<p>SIDDHI AI understands the unique dynamics of the {location} market. Our team combines global expertise with local insights to deliver solutions that resonate with your target audience. Whether you're a startup, SME, or enterprise, we have the right strategy for you.</p>"""
-
-def generate_benefits(primary_kw: str, location: str) -> str:
-    benefits_pool = [
-        f"<strong>✓ Local Market Expertise:</strong> We understand {location}'s business landscape and consumer behavior.",
-        f"<strong>✓ Customized Solutions:</strong> Tailored {primary_kw} strategies for {location}'s unique requirements.",
-        f"<strong>✓ Proven Results:</strong> Track record of successful projects across {location}.",
-        f"<strong>✓ Cost-Effective:</strong> Competitive pricing without compromising on quality.",
-        f"<strong>✓ Ongoing Support:</strong> 24/7 assistance from our {location}-based team.",
-        f"<strong>✓ Data-Driven Approach:</strong> We use analytics to continuously optimize your campaigns.",
-        f"<strong>✓ Award-Winning Team:</strong> Recognized experts in {primary_kw} and digital innovation."
-    ]
-    selected = random.sample(benefits_pool, min(6, len(benefits_pool)))
-    items = "".join(f"<li>{item}</li>" for item in selected)
-    return f"""<h2>Key Benefits of Professional {primary_kw.title()} in {location}</h2>
-<ul class="space-y-3">{items}</ul>"""
-
-def generate_services(primary_kw: str, location: str) -> str:
-    services_list = [
-        f"<strong>🔹 Complete {primary_kw} Packages:</strong> End-to-end solutions for startups and enterprises.",
-        f"<strong>🔹 Custom Strategy Development:</strong> Tailored approaches for your specific goals.",
-        f"<strong>🔹 Implementation & Management:</strong> Full-service execution with regular updates.",
-        f"<strong>🔹 Analytics & Reporting:</strong> Detailed insights into your campaign performance.",
-        f"<strong>🔹 Training & Workshops:</strong> Hands-on {primary_kw} training for your team in {location}.",
-        f"<strong>🔹 24/7 Support:</strong> Round-the-clock assistance from our experts."
-    ]
-    items = "".join(f"<li>{item}</li>" for item in services_list)
-    return f"""<h2>Our {primary_kw.title()} Services in {location}</h2>
-<p>SIDDHI AI offers comprehensive {primary_kw} solutions designed for businesses in {location}:</p>
-<ul class="space-y-2">{items}</ul>"""
-
-def generate_faqs(primary_kw: str, location: str, areas_str: str) -> str:
-    faq_pool = [
-        (f"❓ How much does {primary_kw} cost in {location}?",
-         f"Prices vary based on project scope and requirements. Contact SIDDHI AI for a free, no-obligation quote tailored to your needs."),
-        (f"❓ Why choose SIDDHI AI for {primary_kw} in {location}?",
-         f"SIDDHI AI combines international standards with local expertise. We're verified (GST & Udyam), have 66+ global clients, and offer 24/7 support from our {location} team."),
-        (f"❓ How quickly can I see results?",
-         f"Timelines depend on the specific service. Typically, clients see initial improvements within 2-3 months of starting our {primary_kw} services."),
-        (f"❓ Do you serve specific areas within {location}?",
-         f"Yes! We serve all areas including {areas_str}."),
-        (f"❓ What industries do you specialize in?",
-         f"We work with a wide range of industries including e-commerce, healthcare, education, real estate, and technology."),
-        (f"❓ Can I get a customized package?",
-         f"Absolutely! We tailor our services to meet your unique business needs and budget.")
-    ]
-    selected = random.sample(faq_pool, min(5, len(faq_pool)))
-    faq_html = ""
-    for q, a in selected:
-        faq_html += f"""
-    <div>
-        <h3>{q}</h3>
-        <p>{a}</p>
-    </div>"""
-    return f"""<h2>Frequently Asked Questions About {primary_kw} in {location}</h2>
-<div class="space-y-6">{faq_html}</div>"""
-
-def generate_success_story(primary_kw: str, location: str) -> str:
-    stories = [
-        (f"Startup in {location}", f"increased their website traffic by 200% and doubled sales within 6 months using our {primary_kw} services."),
-        (f"Local e‑commerce store", f"achieved a 150% boost in conversions after implementing our {primary_kw} strategies."),
-        (f"Educational institution", f"saw a 300% increase in course enrollments through targeted {primary_kw} campaigns."),
-        (f"Real estate agency", f"generated 80+ qualified leads per month with our {primary_kw} expertise."),
-    ]
-    client, result = random.choice(stories)
-    return f"""<h2>Success Story: {client}</h2>
-<p>A {client} in {location} partnered with SIDDHI AI to transform their online presence through our {primary_kw} services. Within months, they {result}</p>"""
-
-def generate_cta(primary_kw: str, location: str) -> str:
-    return f"""<div class="text-center my-12">
-    <p class="text-lg mb-6">Ready to dominate {primary_kw} in {location}? Let's talk!</p>
-    <a href="/#contact" class="btn-creepy inline-flex bg-accent text-obsidian px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:bg-textmain shadow-[0_0_20px_rgba(var(--accent-rgb),0.2)]">
-        <span class="btn-text-content">Free Consultation</span>
-        <div class="eyes-wrapper">
-            <div class="creepy-eye"><div class="creepy-pupil"></div></div>
-            <div class="creepy-eye"><div class="creepy-pupil"></div></div>
-        </div>
-    </a>
-</div>"""
-
-def generate_related_posts(current_post_filename: str) -> str:
-    """Generate a list of links to other blog posts (excluding current)."""
-    posts = []
-    if os.path.exists(POSTS_DIR):
-        all_posts = [f for f in os.listdir(POSTS_DIR) if f.endswith('.html') and f != current_post_filename]
-        selected = random.sample(all_posts, min(3, len(all_posts))) if all_posts else []
-        for fname in selected:
-            content = safe_read_file(os.path.join(POSTS_DIR, fname))
-            if content:
-                title_match = re.search(r'<h1[^>]*>(.*?)</h1>', content, re.DOTALL)
-                title = title_match.group(1).strip() if title_match else fname.replace('.html', '').replace('-', ' ').title()
-                posts.append((title, f"/blog/posts/{fname}"))
-    if not posts:
-        return ""
+def generate_content_with_zhipu(prompt: str, max_tokens: int = 2000) -> Optional[str]:
+    """Generate content using Zhipu API with retry logic."""
+    client = init_zhipu_client()
+    if not client:
+        return None
     
-    links = "".join(f'<li><a href="{url}" class="hover:text-accent transition-colors">{title}</a></li>' for title, url in posts)
-    return f"""
-<div class="mt-16 pt-8 border-t border-textmain/10">
-    <h3 class="text-2xl font-serif mb-6">Related Articles</h3>
-    <ul class="space-y-2">{links}</ul>
-</div>"""
+    for attempt in range(MAX_RETRIES):
+        try:
+            logger.info(f"Generating content with Zhipu (attempt {attempt + 1}/{MAX_RETRIES})")
+            
+            response = client.chat.completions.create(
+                model=ZHIPU_MODEL,
+                messages=[
+                    {"role": "system", "content": "You are an expert SEO content writer for SIDDHI AI, a premier digital marketing and web development agency. Write in a professional, informative, and engaging style. Use proper HTML formatting with h2, h3, p, ul, li tags. Include relevant keywords naturally. Make content unique, valuable, and actionable."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7,
+                max_tokens=max_tokens,
+                top_p=0.9
+            )
+            
+            if response and response.choices:
+                content = response.choices[0].message.content
+                logger.info(f"✅ Content generated successfully ({len(content)} chars)")
+                return content
+            else:
+                logger.warning("Empty response from Zhipu API")
+                
+        except Exception as e:
+            logger.error(f"Zhipu API error (attempt {attempt + 1}): {e}")
+            if attempt < MAX_RETRIES - 1:
+                time.sleep(RETRY_DELAY * (2 ** attempt))
+    
+    logger.error("All Zhipu API retry attempts failed")
+    return None
 
-def generate_article(primary_kw: str, location: str) -> Tuple[str, str, str]:
+def generate_fallback_content(primary_kw: str, location: str) -> str:
+    """Generate fallback content if Zhipu API fails."""
+    year = datetime.datetime.now().year
+    
+    return f"""
+<h2>Introduction to {primary_kw} in {location}</h2>
+<p>Are you looking for professional <strong>{primary_kw} services in {location}</strong>? SIDDHI AI is your trusted partner for high-quality {primary_kw} solutions tailored to the {location} market. With our expertise and proven track record, we help businesses achieve their digital goals efficiently.</p>
+
+<h2>Why Choose SIDDHI AI for {primary_kw} in {location}</h2>
+<ul>
+    <li><strong>Local Expertise:</strong> Deep understanding of {location}'s business landscape</li>
+    <li><strong>Customized Solutions:</strong> Tailored strategies for your specific needs</li>
+    <li><strong>Proven Results:</strong> Track record of successful projects in {location}</li>
+    <li><strong>Competitive Pricing:</strong> Affordable packages without compromising quality</li>
+    <li><strong>24/7 Support:</strong> Dedicated assistance from our expert team</li>
+</ul>
+
+<h2>Our {primary_kw} Services in {location}</h2>
+<p>SIDDHI AI offers comprehensive {primary_kw} solutions designed for businesses in {location}. From strategy development to implementation and ongoing support, we provide end-to-end services that drive real results.</p>
+
+<h2>Success Stories in {location}</h2>
+<p>We've helped numerous clients in {location} transform their digital presence through our {primary_kw} expertise. Contact us to learn how we can help your business succeed.</p>
+
+<div class="text-center my-12">
+    <a href="/#contact" class="btn-creepy inline-flex bg-accent text-obsidian px-8 py-4 rounded-full">Get Free Consultation</a>
+</div>
+"""
+
+def generate_full_article(primary_kw: str, location: str) -> Tuple[str, str, str]:
+    """
+    Generate complete article using Zhipu API.
+    Returns (html_content, title, meta_description)
+    """
     year = datetime.datetime.now().year
     current_date = datetime.datetime.now().strftime("%B %d, %Y")
     
+    # Title variations
     title_templates = [
         f"Best {primary_kw} in {location} – {year} Complete Guide",
         f"Top {primary_kw} Services in {location}: {year} Review",
@@ -300,36 +248,57 @@ def generate_article(primary_kw: str, location: str) -> Tuple[str, str, str]:
     
     meta_description = f"Looking for expert {primary_kw} in {location}? SIDDHI AI provides top-rated {primary_kw.lower()} solutions. Free consultation! ⭐⭐⭐⭐⭐"
     
-    lsi_keywords = get_lsi_keywords(f"{primary_kw} {location}")
+    # Build comprehensive prompt for Zhipu
+    prompt = f"""
+Write a comprehensive, SEO-optimized blog article about "{primary_kw} in {location}" for SIDDHI AI website.
+
+## ARTICLE REQUIREMENTS:
+- Title: {title}
+- Target Location: {location}
+- Primary Keyword: {primary_kw}
+- Year: {year}
+- Tone: Professional, informative, engaging
+- Length: 1200-1500 words
+- Format: Use proper HTML tags (h2 for sections, h3 for subsections, p for paragraphs, ul/li for lists)
+
+## STRUCTURE:
+1. **Engaging Introduction** - Hook the reader, introduce the topic, mention SIDDHI AI's expertise
+2. **Why {location} is Ideal for {primary_kw}** - Local market insights, trends, opportunities
+3. **Key Benefits of Professional {primary_kw}** - At least 5-6 benefits with explanations
+4. **SIDDHI AI's {primary_kw} Services in {location}** - Detailed service offerings
+5. **Success Stories/Case Studies** - Real or illustrative examples of results
+6. **Expert Tips for Choosing {primary_kw} Services** - Practical advice for readers
+7. **Frequently Asked Questions** - 5-6 FAQs with answers
+8. **Strong Call-to-Action** - Encourage consultation
+
+## SEO REQUIREMENTS:
+- Naturally incorporate these keywords: {primary_kw}, {location}, {primary_kw} in {location}, best {primary_kw} services
+- Include location-specific terms and local landmarks/areas where relevant
+- Write unique, valuable content that helps readers make informed decisions
+- Include statistics or data points where appropriate
+
+## BRAND VOICE:
+- SIDDHI AI is a premier digital marketing and web development agency
+- We emphasize: expertise, results, innovation, client success
+- Professional but approachable
+- Confident but not arrogant
+
+Generate the complete article content with proper HTML formatting.
+"""
     
-    if ',' in location:
-        city = location.split(',')[0].strip()
-        areas_list = AREAS.get(city, ['all neighborhoods'])
-    else:
-        areas_list = ['all areas']
-    areas_str = ', '.join(areas_list)
+    # Try Zhipu API first
+    logger.info(f"Generating article for {primary_kw} in {location} using Zhipu API")
+    body_content = generate_content_with_zhipu(prompt, max_tokens=3000)
     
-    sections = [
-        generate_intro(primary_kw, location, lsi_keywords),
-        generate_why_location(primary_kw, location, lsi_keywords),
-        generate_benefits(primary_kw, location),
-        generate_services(primary_kw, location),
-        generate_faqs(primary_kw, location, areas_str),
-        generate_success_story(primary_kw, location),
-        generate_cta(primary_kw, location)
-    ]
+    # Fallback to template if API fails
+    if not body_content:
+        logger.warning("Zhipu API failed, using fallback content")
+        body_content = generate_fallback_content(primary_kw, location)
     
-    # Shuffle middle sections for variety
-    middle = sections[1:-1]
-    random.shuffle(middle)
-    sections = [sections[0]] + middle + [sections[-1]]
+    # Generate related posts
+    related_html = generate_related_posts(f"{slugify(primary_kw)}-{slugify(location)}.html")
     
-    body_content = "\n\n".join(sections)
-    
-    related = generate_related_posts(f"{slugify(primary_kw)}-{slugify(location)}.html")
-    if related:
-        body_content += "\n\n" + related
-    
+    # Complete HTML template (same as before)
     html = f"""<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
@@ -337,7 +306,7 @@ def generate_article(primary_kw: str, location: str) -> Tuple[str, str, str]:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
     <meta name="description" content="{meta_description}">
-    <meta name="keywords" content="{primary_kw}, {location}, {', '.join(lsi_keywords[:10]) if lsi_keywords else primary_kw}, SIDDHI AI, digital agency, web development, SEO, Python training">
+    <meta name="keywords" content="{primary_kw}, {location}, SIDDHI AI, digital agency, web development, SEO, Python training">
     
     <!-- Open Graph -->
     <meta property="og:title" content="{title}">
@@ -534,6 +503,7 @@ def generate_article(primary_kw: str, location: str) -> Tuple[str, str, str]:
             
             <div class="blog-content glass-panel rounded-[2rem] p-8 md:p-12">
                 {body_content}
+                {related_html}
             </div>
         </article>
     </main>
@@ -550,8 +520,32 @@ def generate_article(primary_kw: str, location: str) -> Tuple[str, str, str]:
     
     return html, title, meta_description
 
+def generate_related_posts(current_post_filename: str) -> str:
+    """Generate related posts section."""
+    posts = []
+    if os.path.exists(POSTS_DIR):
+        all_posts = [f for f in os.listdir(POSTS_DIR) if f.endswith('.html') and f != current_post_filename]
+        selected = random.sample(all_posts, min(3, len(all_posts))) if all_posts else []
+        for fname in selected:
+            content = safe_read_file(os.path.join(POSTS_DIR, fname))
+            if content:
+                title_match = re.search(r'<h1[^>]*>(.*?)</h1>', content, re.DOTALL)
+                title = title_match.group(1).strip() if title_match else fname.replace('.html', '').replace('-', ' ').title()
+                posts.append((title, f"/blog/posts/{fname}"))
+    
+    if not posts:
+        return ""
+    
+    links = "".join(f'<li><a href="{url}" class="hover:text-accent transition-colors">{title}</a></li>' for title, url in posts)
+    return f"""
+<div class="mt-16 pt-8 border-t border-textmain/10">
+    <h3 class="text-2xl font-serif mb-6">Related Articles</h3>
+    <ul class="space-y-2">{links}</ul>
+</div>"""
+
 # -------------------- BLOG INDEX GENERATION --------------------
 def generate_blog_index() -> str:
+    """Generate blog index page with RGB cards."""
     posts = []
     if not os.path.exists(POSTS_DIR):
         os.makedirs(POSTS_DIR, exist_ok=True)
@@ -622,10 +616,9 @@ def generate_blog_index() -> str:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIDDHI AI Blog - Insights & Articles</title>
     <meta name="description" content="Expert insights on Python training, digital marketing, web development, and AI solutions. SIDDHI AI's official blog with daily updates and industry trends.">
-    <meta name="keywords" content="Python training blog, digital marketing tips, web development articles, AI insights, SEO guide, Madhya Pradesh, India">
     
     <meta property="og:title" content="SIDDHI AI Blog">
-    <meta property="og:description" content="Expert insights on Python training, digital marketing, web development, and AI solutions.">
+    <meta property="og:description" content="Expert insights and daily articles from SIDDHI AI.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{SITE_URL}/blog/">
     
@@ -662,12 +655,10 @@ def generate_blog_index() -> str:
             background-color: rgb(var(--bg-rgb));
             color: rgb(var(--text-rgb));
             font-family: 'Plus Jakarta Sans', sans-serif;
-            transition: background-color 0.5s ease, color 0.5s ease;
         }}
         .glass-panel {{
             background: var(--card-bg);
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(var(--accent-rgb), 0.3);
         }}
         .gold-gradient {{
             background: linear-gradient(135deg, rgb(var(--accent-rgb)) 0%, #FFF8DC 50%, rgb(var(--accent-rgb)) 100%);
@@ -704,9 +695,6 @@ def generate_blog_index() -> str:
             border-radius: calc(1.5rem - 2px);
             z-index: 10;
             padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            height: calc(100% - 4px);
         }}
         @keyframes rgbSpin {{
             100% {{ transform: rotate(360deg); }}
@@ -714,26 +702,17 @@ def generate_blog_index() -> str:
         .btn-creepy {{
             position: relative;
             overflow: hidden;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
         }}
         .btn-creepy .eyes-wrapper {{
             position: absolute;
             right: 1.5rem;
             top: 50%;
             transform: translateY(-50%);
-            display: flex;
-            gap: 4px;
             opacity: 0;
             transition: opacity 0.3s ease;
-            pointer-events: none;
         }}
         .btn-creepy:hover .eyes-wrapper {{
             opacity: 1;
-        }}
-        .btn-creepy:hover .btn-text-content {{
-            transform: translateX(-15px);
         }}
         .line-clamp-2 {{
             display: -webkit-box;
@@ -756,7 +735,7 @@ def generate_blog_index() -> str:
     </script>
 </head>
 <body>
-    <!-- Navigation (matches main site) -->
+    <!-- Navigation -->
     <nav class="fixed w-full z-50 backdrop-blur-md border-b border-textmain/10 bg-obsidian/40">
         <div class="max-w-7xl mx-auto px-6 lg:px-12">
             <div class="flex justify-between items-center h-20">
@@ -811,11 +790,6 @@ def generate_blog_index() -> str:
     <footer class="py-12 border-t border-textmain/10 bg-obsidian">
         <div class="max-w-7xl mx-auto px-6 text-center">
             <span class="font-extrabold text-2xl tracking-tighter text-textmain mb-6 block">SIDDHI <span class="text-accent">AI</span></span>
-            <div class="flex justify-center gap-6 mb-6">
-                <a href="https://github.com/CodeWander-666-github" class="text-textmuted hover:text-accent">
-                    <i data-lucide="github" class="w-5 h-5"></i>
-                </a>
-            </div>
             <p class="text-[9px] text-textmuted uppercase tracking-widest">&copy; 2017-{year} SIDDHI AI. All rights reserved.</p>
         </div>
     </footer>
@@ -831,7 +805,7 @@ def generate_blog_index() -> str:
 # -------------------- MAIN --------------------
 def main():
     logger.info("=" * 60)
-    logger.info("🚀 Starting SIDDHI AI Enhanced Blog Generator")
+    logger.info("🚀 Starting SIDDHI AI Blog Generator (Zhipu AI Powered)")
     logger.info("=" * 60)
     
     try:
@@ -842,7 +816,7 @@ def main():
         logger.info(f"📝 Primary keyword: {primary_kw}")
         logger.info(f"📍 Location: {location} ({loc_type})")
         
-        html, title, meta = generate_article(primary_kw, location)
+        html, title, meta = generate_full_article(primary_kw, location)
         
         date_str = datetime.datetime.now().strftime("%Y-%m-%d")
         base_slug = slugify(f"{primary_kw}-{location}")
