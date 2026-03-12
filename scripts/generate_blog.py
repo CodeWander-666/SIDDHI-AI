@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+"""
+SIDDHI AI - Automated Blog Generator
+Generates daily SEO-optimized articles targeting multiple location levels.
+Matches the premium design of the main website.
+"""
+
 import os
 import random
 import datetime
@@ -6,27 +13,19 @@ import requests
 import logging
 import sys
 import time
+import json
 from string import punctuation
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Any
+from pathlib import Path
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('blog_generator.log'),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
-logger = logging.getLogger(__name__)
-
-# ---------- CONFIGURATION ----------
-SITE_URL = "https://siddhiai-welcome.vercel.app"  # Your live site
+# -------------------- CONFIGURATION --------------------
+SITE_URL = "https://siddhiai-welcome.vercel.app"          # Your live site
 BLOG_DIR = "blog"
 POSTS_DIR = os.path.join(BLOG_DIR, "posts")
 INDEX_FILE = os.path.join(BLOG_DIR, "index.html")
+LOG_FILE = "blog_generator.log"
 
-# Core service topics
+# Core service topics (expand as needed)
 SERVICES = [
     "Python Training", "Digital Marketing", "SEO Services",
     "Web Development", "AI Solutions", "E-commerce Website",
@@ -59,17 +58,27 @@ REQUEST_TIMEOUT = 10
 MAX_RETRIES = 3
 RETRY_DELAY = 2
 
-# -----------------------------------
+# Logging setup
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(LOG_FILE, encoding='utf-8'),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger(__name__)
 
+# -------------------- UTILITY FUNCTIONS --------------------
 def slugify(text: str) -> str:
-    """Convert text to URL-friendly slug."""
+    """Convert text to a URL‑friendly slug."""
     text = text.lower().replace(" ", "-")
     text = re.sub(rf"[{re.escape(punctuation)}]", "", text)
-    text = re.sub(r"-+", "-", text)  # Replace multiple hyphens
+    text = re.sub(r"-+", "-", text)          # Replace multiple hyphens
     return text.strip("-")
 
 def fetch_with_retry(url: str, params: Dict = None, max_retries: int = MAX_RETRIES) -> Optional[requests.Response]:
-    """Fetch URL with retry logic and exponential backoff."""
+    """Fetch URL with exponential backoff retry logic."""
     for attempt in range(max_retries):
         try:
             response = requests.get(url, params=params, timeout=REQUEST_TIMEOUT)
@@ -110,7 +119,7 @@ def safe_read_file(filepath: str) -> Optional[str]:
         return None
 
 def safe_write_file(filepath: str, content: str) -> bool:
-    """Safely write content to a file with directory creation."""
+    """Safely write content to a file, creating directories if needed."""
     try:
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -121,6 +130,37 @@ def safe_write_file(filepath: str, content: str) -> bool:
         logger.error(f"Error writing file {filepath}: {e}")
         return False
 
+def select_location() -> Tuple[str, str]:
+    """
+    Select a random location with weighted probabilities:
+    - 10% global
+    - 20% country (India)
+    - 20% state (MP or Karnataka)
+    - 30% city (Indore, Bhopal, Bangalore, etc.)
+    - 20% area (specific neighbourhoods)
+    Returns (location_string, location_type)
+    """
+    levels = ['global', 'country', 'state', 'city', 'area']
+    weights = [0.1, 0.2, 0.2, 0.3, 0.2]
+    level = random.choices(levels, weights=weights)[0]
+    
+    if level == 'global':
+        return random.choice(GLOBAL_LOCATIONS), "global"
+    elif level == 'country':
+        return COUNTRY, "country"
+    elif level == 'state':
+        state = random.choice(list(STATES.keys()))
+        return state, "state"
+    elif level == 'city':
+        state = random.choice(list(STATES.keys()))
+        city = random.choice(STATES[state])
+        return f"{city}, {state}", "city"
+    else:  # area
+        city = random.choice(list(AREAS.keys()))
+        area = random.choice(AREAS[city])
+        return f"{area}, {city}", "area"
+
+# -------------------- ARTICLE GENERATION --------------------
 def generate_article(topic: str, location: str) -> Tuple[str, str, str]:
     """
     Create a complete HTML article with SEO elements matching your design.
@@ -135,18 +175,16 @@ def generate_article(topic: str, location: str) -> Tuple[str, str, str]:
     lsi_keywords = get_lsi_keywords(f"{topic} {location}")
     lsi_phrase = ", ".join(lsi_keywords[:3]) if lsi_keywords else f"{topic} solutions"
     
-    # Intro
+    # --- Content sections ---
     intro = f"""<p>Are you searching for professional <strong>{topic} in {location}</strong>? You've come to the right place. At <strong>SIDDHI AI</strong>, we specialize in delivering world-class {topic} services tailored to businesses and individuals in {location}. With our proven track record and cutting-edge technology, we've helped hundreds of clients achieve their digital goals.</p>
 
 <p>In this comprehensive guide, we'll explore everything you need to know about {topic} in {location}, including local trends, pricing, and how SIDDHI AI can help you succeed in {year}.</p>"""
 
-    # Why location
     location_section = f"""<h2>Why {location} is Perfect for {topic}</h2>
 <p>{location} has emerged as a thriving hub for digital innovation and business growth. With a rapidly expanding economy and increasing demand for professional {topic.lower()} services, now is the ideal time to invest in {topic}. Local businesses in {location} are leveraging {lsi_phrase} to gain competitive advantages and reach wider audiences.</p>
 
 <p>SIDDHI AI understands the unique dynamics of the {location} market. Our team combines global expertise with local insights to deliver solutions that resonate with your target audience.</p>"""
 
-    # Benefits
     benefits = f"""<h2>Key Benefits of Professional {topic} in {location}</h2>
 <ul class="space-y-3">
     <li><strong>✓ Local Market Expertise:</strong> We understand {location}'s business landscape and consumer behavior.</li>
@@ -156,7 +194,6 @@ def generate_article(topic: str, location: str) -> Tuple[str, str, str]:
     <li><strong>✓ Ongoing Support:</strong> 24/7 assistance from our {location}-based team.</li>
 </ul>"""
 
-    # Services
     services = f"""<h2>Our {topic} Services in {location}</h2>
 <p>SIDDHI AI offers comprehensive {topic} solutions designed for businesses in {location}:</p>
 <ul class="space-y-2">
@@ -167,7 +204,7 @@ def generate_article(topic: str, location: str) -> Tuple[str, str, str]:
     <li><strong>🔹 Training & Workshops:</strong> Hands-on {topic} training for your team in {location}.</li>
 </ul>"""
 
-    # FAQ - precompute area list to avoid nested f-string complexity
+    # Pre‑compute area list for FAQ to avoid nested f‑string complexity
     if ',' in location:
         city = location.split(',')[0].strip()
         areas_list = AREAS.get(city, ['all neighborhoods'])
@@ -195,7 +232,6 @@ def generate_article(topic: str, location: str) -> Tuple[str, str, str]:
     </div>
 </div>"""
 
-    # Success story
     success = f"""<h2>Success Story: {topic} in {location}</h2>
 <p>Recently, we helped a local business in {location} transform their online presence through our {topic} services. Within 6 months, they experienced:</p>
 <ul class="space-y-2">
@@ -204,7 +240,6 @@ def generate_article(topic: str, location: str) -> Tuple[str, str, str]:
     <li>🏆 Top 3 search rankings for key terms in {location}</li>
 </ul>"""
 
-    # Call to action
     cta = f"""<div class="text-center my-12">
     <p class="text-lg mb-6">Ready to dominate {topic} in {location}? Let's talk!</p>
     <a href="/#contact" class="btn-creepy inline-flex bg-accent text-obsidian px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:bg-textmain shadow-[0_0_20px_rgba(var(--accent-rgb),0.2)]">
@@ -218,8 +253,7 @@ def generate_article(topic: str, location: str) -> Tuple[str, str, str]:
 
     body_content = "\n\n".join([intro, location_section, benefits, services, faqs, success, cta])
 
-    # Complete HTML – note: we must escape any curly braces inside CSS/JS that are not variables
-    # The triple-quoted f-string will treat {{ and }} as escaped braces.
+    # --- Complete HTML template (with proper escaping of curly braces) ---
     html = f"""<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
@@ -239,13 +273,12 @@ def generate_article(topic: str, location: str) -> Tuple[str, str, str]:
     <!-- Canonical URL -->
     <link rel="canonical" href="{SITE_URL}/blog/posts/{slugify(topic)}-{slugify(location)}.html">
     
-    <!-- Tailwind & Fonts -->
+    <!-- Tailwind & Lucide -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS variables – these must be escaped as {{ and }} in f-string */
         :root {{
             --bg-rgb: 2, 2, 3;
             --accent-rgb: 229, 183, 105;
@@ -441,8 +474,12 @@ def generate_article(topic: str, location: str) -> Tuple[str, str, str]:
     
     return html, title, meta_description
 
+# -------------------- BLOG INDEX GENERATION --------------------
 def generate_blog_index() -> str:
-    """Generate the main blog listing page with RGB cards for each post."""
+    """
+    Generate the main blog listing page with RGB cards for each post.
+    Uses absolute paths (/blog/posts/filename.html) to prevent 404 errors.
+    """
     posts = []
     
     if not os.path.exists(POSTS_DIR):
@@ -457,7 +494,7 @@ def generate_blog_index() -> str:
         if not content:
             continue
         
-        # Extract title
+        # Extract title from <h1>
         title_match = re.search(r'<h1[^>]*>(.*?)</h1>', content, re.DOTALL)
         title = title_match.group(1).strip() if title_match else fname.replace('.html', '').replace('-', ' ').title()
         
@@ -482,11 +519,11 @@ def generate_blog_index() -> str:
             'title': title,
             'description': description[:120] + "..." if len(description) > 120 else description,
             'date': display_date,
-            'url': f'posts/{fname}',
+            'filename': fname,
             'location': location
         })
     
-    # Build cards HTML
+    # Build RGB cards HTML
     cards_html = ""
     for post in posts:
         cards_html += f"""
@@ -500,7 +537,7 @@ def generate_blog_index() -> str:
                     </div>
                     <h3 class="text-xl font-bold text-textmain mb-3 line-clamp-2">{post['title']}</h3>
                     <p class="text-textmuted text-sm font-light mb-4 flex-1 line-clamp-3">{post['description']}</p>
-                    <a href="{post['url']}" class="btn-creepy self-start mt-auto bg-transparent border border-accent text-accent px-6 py-2 rounded-full text-[9px] font-bold uppercase tracking-widest hover:bg-accent hover:text-obsidian transition-all">
+                    <a href="/blog/posts/{post['filename']}" class="btn-creepy self-start mt-auto bg-transparent border border-accent text-accent px-6 py-2 rounded-full text-[9px] font-bold uppercase tracking-widest hover:bg-accent hover:text-obsidian transition-all">
                         <span class="btn-text-content">Read More</span>
                         <div class="eyes-wrapper">
                             <div class="creepy-eye"><div class="creepy-pupil"></div></div>
@@ -659,7 +696,7 @@ def generate_blog_index() -> str:
     </script>
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- Navigation (matches main site) -->
     <nav class="fixed w-full z-50 backdrop-blur-md border-b border-textmain/10 bg-obsidian/40">
         <div class="max-w-7xl mx-auto px-6 lg:px-12">
             <div class="flex justify-between items-center h-20">
@@ -731,38 +768,23 @@ def generate_blog_index() -> str:
     
     return index_html
 
-def select_location() -> Tuple[str, str]:
-    """Select a random location with weighted probabilities."""
-    levels = ['global', 'country', 'state', 'city', 'area']
-    weights = [0.1, 0.2, 0.2, 0.3, 0.2]
-    level = random.choices(levels, weights=weights)[0]
-    
-    if level == 'global':
-        return random.choice(GLOBAL_LOCATIONS), "global"
-    elif level == 'country':
-        return COUNTRY, "country"
-    elif level == 'state':
-        state = random.choice(list(STATES.keys()))
-        return state, "state"
-    elif level == 'city':
-        state = random.choice(list(STATES.keys()))
-        city = random.choice(STATES[state])
-        return f"{city}, {state}", "city"
-    else:  # area
-        city = random.choice(list(AREAS.keys()))
-        area = random.choice(AREAS[city])
-        return f"{area}, {city}", "area"
-
+# -------------------- MAIN EXECUTION --------------------
 def main():
-    logger.info("=" * 50)
-    logger.info("Starting blog post generation")
+    logger.info("=" * 60)
+    logger.info("🚀 Starting SIDDHI AI Blog Generator")
+    logger.info("=" * 60)
     
     try:
+        # Ensure posts directory exists
         os.makedirs(POSTS_DIR, exist_ok=True)
+        
+        # Select random topic and location
         topic = random.choice(SERVICES)
         location, loc_type = select_location()
-        logger.info(f"Topic: {topic}, Location: {location} ({loc_type})")
+        logger.info(f"📝 Selected topic: {topic}")
+        logger.info(f"📍 Selected location: {location} ({loc_type})")
         
+        # Generate article
         html, title, meta = generate_article(topic, location)
         
         # Create unique filename
@@ -775,11 +797,13 @@ def main():
             name, ext = os.path.splitext(filename)
             filepath = os.path.join(POSTS_DIR, f"{name}-{counter}{ext}")
             counter += 1
+            logger.info(f"File exists, trying: {os.path.basename(filepath)}")
         
+        # Save article
         if safe_write_file(filepath, html):
             logger.info(f"✅ Article saved: {filepath}")
         else:
-            logger.error("Failed to save article")
+            logger.error("❌ Failed to save article")
             return
         
         # Update blog index
@@ -787,12 +811,13 @@ def main():
         if safe_write_file(INDEX_FILE, index_html):
             logger.info(f"✅ Blog index updated: {INDEX_FILE}")
         else:
-            logger.error("Failed to update blog index")
+            logger.error("❌ Failed to update blog index")
             return
         
         logger.info("🎉 Blog generation completed successfully!")
+        
     except Exception as e:
-        logger.error(f"Fatal error: {e}", exc_info=True)
+        logger.error(f"💥 Fatal error: {e}", exc_info=True)
         sys.exit(1)
 
 if __name__ == "__main__":
