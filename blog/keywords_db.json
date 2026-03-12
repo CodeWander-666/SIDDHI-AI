@@ -22,9 +22,9 @@
     "difficulty": 0.1,
     "opportunity": 1000.0,
     "score": 5000.0,
-    "used": false,
-    "date_used": null,
-    "filename": null,
+    "used": true,
+    "date_used": "2026-03-12T17:45:17.254005",
+    "filename": "2026-03-12-serviceswebdevelopmentunitedstates.html",
     "pillar": false
   },
   {
