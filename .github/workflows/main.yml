@@ -2,8 +2,8 @@ name: Daily Blog Post Generator
 
 on:
   schedule:
-    - cron: '0 6 * * *'
-  workflow_dispatch:
+    - cron: '0 6 * * *'      # 6:00 AM UTC daily
+  workflow_dispatch:           # manual trigger
 
 jobs:
   generate-post:
@@ -12,46 +12,31 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+          cache: 'pip'
 
-      # DEBUG: Show repository structure
-      - name: Debug - list files
-        run: |
-          echo "Root directory:"
-          ls -la
-          echo "Looking for requirements.txt:"
-          find . -name "requirements.txt"
-
-      # Try installing from requirements.txt; if missing, install directly
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            echo "Installing from requirements.txt"
-            pip install -r requirements.txt
-          else
-            echo "requirements.txt not found, installing directly"
-            pip install zhipuai requests
-          fi
-
-      # Verify installation
-      - name: Verify packages
-        run: pip list | grep -E "zhipuai|requests"
+          python -m pip install --upgrade pip
+          pip install zai-sdk requests
 
       - name: Run blog generator
         env:
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
         run: python scripts/generate_blog.py
 
-      - name: Commit changes
+      - name: Commit and push changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add blog/ blog_generator.log
-          git diff --quiet && git diff --staged --quiet || git commit -m "📝 Add daily blog post [skip ci]"
+          git diff --quiet && git diff --staged --quiet || git commit -m "📝 Add daily blog post for $(date +'%Y-%m-%d') [skip ci]"
           git push
