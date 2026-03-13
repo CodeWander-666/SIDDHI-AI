@@ -2,26 +2,27 @@ name: Daily Blog Post Generator
 
 on:
   schedule:
-    - cron: '0 6 * * *'      # 6:00 AM UTC daily
-  workflow_dispatch:           # manual trigger
+    # Run every day at 6:00 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:   # Allows manual trigger from Actions tab
 
 jobs:
   generate-post:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write   # Required to push changes
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0   # Full history for better logging
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-          cache: 'pip'
+          cache: 'pip'      # Caches pip dependencies for faster runs
 
       - name: Install dependencies
         run: |
@@ -33,10 +34,25 @@ jobs:
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
         run: python scripts/generate_blog.py
 
+      - name: Generate sitemap
+        run: python scripts/generate_sitemap.py
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git add blog/ blog_generator.log sitemap.xml
+          git diff --staged --quiet || echo "changes=true" >> $GITHUB_OUTPUT
+
       - name: Commit and push changes
+        if: steps.git-check.outputs.changes == 'true'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add blog/ blog_generator.log
-          git diff --quiet && git diff --staged --quiet || git commit -m "📝 Add daily blog post for $(date +'%Y-%m-%d') [skip ci]"
+          git commit -m "📝 Add daily blog post and update sitemap for $(date +'%Y-%m-%d') [skip ci]"
           git push
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          echo "❌ Blog generation failed. Check the Actions logs for details."
+          # Optionally, you can add a webhook or email notification here.
