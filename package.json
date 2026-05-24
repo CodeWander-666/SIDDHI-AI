@@ -8,13 +8,13 @@
     "start": "next start"
   },
   "dependencies": {
-    "@built-in-ai/web-llm": "^1.0.1",
+    "@browser-ai/web-llm": "^2.1.7",
     "@mlc-ai/web-llm": "^0.2.83",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "ai": "^6.0.191",
     "framer-motion": "^11.18.2",
-    "next": "16.0.0",
+    "next": "^16.2.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
@@ -28,6 +28,7 @@
     "@types/react-dom": "^19.0.0",
     "@types/three": "^0.184.1",
     "autoprefixer": "^10.5.0",
+    "baseline-browser-mapping": "^2.10.32",
     "typescript": "^5.0.0"
   }
 }
