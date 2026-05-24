@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-rgb: 2, 2, 3;
+  --accent-rgb: 229, 183, 105;
+  --tech-rgb: 0, 240, 255;
+  --text-rgb: 229, 231, 235;
+  --text-muted-rgb: 156, 163, 175;
+  --card-bg: rgba(8, 8, 10, 0.75);
+}
+
+[data-theme="rich"] {
+  --bg-rgb: 26, 11, 46;
+  --accent-rgb: 212, 175, 55;
+  --tech-rgb: 255, 42, 109;
+  --text-rgb: 243, 232, 255;
+  --text-muted-rgb: 216, 180, 226;
+  --card-bg: rgba(26, 11, 46, 0.75);
+}
+
+[data-theme="sunny"] {
+  --bg-rgb: 224, 242, 254;
+  --accent-rgb: 245, 158, 11;
+  --tech-rgb: 2, 132, 199;
+  --text-rgb: 15, 23, 42;
+  --text-muted-rgb: 71, 85, 105;
+  --card-bg: rgba(255, 255, 255, 0.6);
+}
+
+@layer base {
+  body {
+    background-color: rgb(var(--bg-rgb));
+    color: rgb(var(--text-rgb));
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: background-color 0.5s ease, color 0.5s ease;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl transition-all duration-300;
+  }
+  .glass-card:hover {
+    @apply border-gold-400/50 shadow-xl;
+  }
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #0A0A0F; }
+::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 10px; }
+html { scroll-behavior: smooth; }
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.animate-gradient-x {
+  animation: gradient-x 3s ease infinite;
+  background-size: 200% auto;
+}

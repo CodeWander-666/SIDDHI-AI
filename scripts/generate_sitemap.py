@@ -1,71 +1,50 @@
 #!/usr/bin/env python3
-"""
-Generate sitemap.xml for SIDDHI AI.
-Includes homepage, policy page, blog index, and all blog posts.
-"""
-
 import os
 import datetime
-import xml.etree.ElementTree as ET
-from typing import List, Dict
 
-SITE_URL = "https://siddhiai-welcome.vercel.app"
-BLOG_POSTS_DIR = "blog/posts"
-OUTPUT_FILE = "sitemap.xml"
+SITE_URL = "https://kalki.tech"
+BLOG_DIR = "content/blog"
+OUTPUT = "public/sitemap.xml"
 
-STATIC_PAGES = [
-    {"url": "/", "priority": "1.0", "changefreq": "weekly"},
-    {"url": "/policy.html", "priority": "0.3", "changefreq": "monthly"},
-    {"url": "/blog/", "priority": "0.8", "changefreq": "daily"},
-]
-
-def get_blog_post_urls() -> List[Dict]:
-    urls = []
-    if not os.path.exists(BLOG_POSTS_DIR):
-        return urls
-    for fname in os.listdir(BLOG_POSTS_DIR):
-        if fname.endswith(".html"):
-            filepath = os.path.join(BLOG_POSTS_DIR, fname)
-            mtime = os.path.getmtime(filepath)
+def get_blog_posts():
+    posts = []
+    if not os.path.exists(BLOG_DIR):
+        return posts
+    for f in os.listdir(BLOG_DIR):
+        if f.endswith(".md") or f.endswith(".html"):
+            slug = f.replace(".md", "").replace(".html", "")
+            mtime = os.path.getmtime(os.path.join(BLOG_DIR, f))
             lastmod = datetime.datetime.fromtimestamp(mtime).date().isoformat()
-            urls.append({
-                "url": f"/blog/posts/{fname}",
-                "lastmod": lastmod,
-                "priority": "0.6",
-                "changefreq": "monthly"
-            })
-    return urls
+            posts.append({"url": f"/blog/{slug}", "lastmod": lastmod})
+    return posts
 
-def generate_sitemap():
-    root = ET.Element("urlset", xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
-
-    for page in STATIC_PAGES:
-        url_elem = ET.SubElement(root, "url")
-        loc = ET.SubElement(url_elem, "loc")
-        loc.text = SITE_URL + page["url"]
-        priority = ET.SubElement(url_elem, "priority")
-        priority.text = page["priority"]
-        changefreq = ET.SubElement(url_elem, "changefreq")
-        changefreq.text = page["changefreq"]
-        if page["url"] in ["/", "/blog/"]:
-            today = datetime.date.today().isoformat()
-            lastmod = ET.SubElement(url_elem, "lastmod")
-            lastmod.text = today
-
-    for post in get_blog_post_urls():
-        url_elem = ET.SubElement(root, "url")
-        loc = ET.SubElement(url_elem, "loc")
-        loc.text = SITE_URL + post["url"]
-        lastmod = ET.SubElement(url_elem, "lastmod")
-        lastmod.text = post["lastmod"]
-        priority = ET.SubElement(url_elem, "priority")
-        priority.text = post["priority"]
-        changefreq = ET.SubElement(url_elem, "changefreq")
-        changefreq.text = post["changefreq"]
-
-    tree = ET.ElementTree(root)
-    tree.write(OUTPUT_FILE, encoding="utf-8", xml_declaration=True)
-    print(f"✅ Sitemap generated with {len(STATIC_PAGES) + len(get_blog_post_urls())} URLs.")
+def generate():
+    urls = [
+        {"url": "/", "priority": "1.0", "changefreq": "weekly"},
+        {"url": "/ki-cloud", "priority": "0.9", "changefreq": "weekly"},
+        {"url": "/digital-marketing", "priority": "0.9"},
+        {"url": "/plans", "priority": "0.8"},
+        {"url": "/vision", "priority": "0.7"},
+        {"url": "/about", "priority": "0.7"},
+        {"url": "/blog", "priority": "0.8", "changefreq": "daily"},
+    ]
+    for post in get_blog_posts():
+        urls.append({"url": post["url"], "lastmod": post["lastmod"], "priority": "0.6", "changefreq": "monthly"})
+    
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    for u in urls:
+        xml += f'<url><loc>{SITE_URL}{u["url"]}</loc>'
+        if "lastmod" in u:
+            xml += f'<lastmod>{u["lastmod"]}</lastmod>'
+        if "priority" in u:
+            xml += f'<priority>{u["priority"]}</priority>'
+        if "changefreq" in u:
+            xml += f'<changefreq>{u["changefreq"]}</changefreq>'
+        xml += '</url>\n'
+    xml += '</urlset>'
+    with open(OUTPUT, 'w', encoding='utf-8') as f:
+        f.write(xml)
+    print(f"Sitemap written to {OUTPUT} with {len(urls)} URLs")
 
 if __name__ == "__main__":
-    generate_sitemap()
+    generate()

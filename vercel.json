@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://kalki.tech/$1",
+      "permanent": true
+    }
+  ]
+}
