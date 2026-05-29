@@ -6,6 +6,7 @@ import { useKI } from '@/context/KIContext';
 import { NodeTracker } from '@/components/NodeTracker';
 import { GradientBackground } from '@/components/GradientBackground';
 import Link from 'next/link';
+import { Menu, X, Plus, Trash2, Edit2 } from 'lucide-react';
 
 interface Conversation {
   id: string;
@@ -20,10 +21,11 @@ function ChatContent() {
   const currentId = searchParams.get('id');
   const { engine } = useKI();
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
 
-  // Load conversations from localStorage
+  // Load/save conversations from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('ki_conversations');
     if (stored) {
@@ -37,13 +39,18 @@ function ChatContent() {
         }));
         setConversations(convs);
       } catch (e) {
-        console.error('Failed to parse conversations', e);
         initDefaultConversation();
       }
     } else {
       initDefaultConversation();
     }
   }, []);
+
+  useEffect(() => {
+    if (conversations.length > 0) {
+      localStorage.setItem('ki_conversations', JSON.stringify(conversations));
+    }
+  }, [conversations]);
 
   const initDefaultConversation = () => {
     const newConv: Conversation = {
@@ -56,12 +63,6 @@ function ChatContent() {
     setConversations([newConv]);
     localStorage.setItem('ki_conversations', JSON.stringify([newConv]));
   };
-
-  useEffect(() => {
-    if (conversations.length > 0) {
-      localStorage.setItem('ki_conversations', JSON.stringify(conversations));
-    }
-  }, [conversations]);
 
   const getCurrentConversation = (): Conversation | undefined => {
     if (!currentId) return conversations[0];
@@ -90,13 +91,14 @@ function ChatContent() {
     };
     setConversations(prev => [newConv, ...prev]);
     window.history.pushState({}, '', `/chat?id=${newConv.id}`);
+    setDrawerOpen(false);
   };
 
   const renameChat = (id: string, newTitle: string) => {
     if (newTitle.trim()) {
       updateConversation(id, { title: newTitle.trim() });
     }
-    setDropdownOpen(null);
+    setEditingId(null);
   };
 
   const deleteChat = (id: string) => {
@@ -110,7 +112,7 @@ function ChatContent() {
         window.history.pushState({}, '', `/chat?id=${newConversations[0].id}`);
       }
     }
-    setDropdownOpen(null);
+    setDrawerOpen(false);
   };
 
   const handleSendMessage = async (prompt: string): Promise<string> => {
@@ -140,60 +142,82 @@ Answer questions about web development, digital marketing, AI automation, SEO, s
   if (!currentConv) return null;
 
   return (
-    <div className="fixed inset-0 flex overflow-hidden z-50">
-      {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-80' : 'w-0'} transition-all duration-300 bg-black/80 backdrop-blur-xl border-r border-white/10 flex flex-col h-full overflow-hidden z-20`}>
-        {sidebarOpen && (
-          <>
-            <div className="p-4 border-b border-white/10">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xs uppercase tracking-wider text-gold-400">KI Network</h3>
-                <NodeTracker />
-              </div>
-              <div className="text-xs text-center text-cyan-400">{conversations.length} conversations</div>
+    <>
+      <GradientBackground />
+      <div className="fixed inset-0 flex flex-col bg-black z-50">
+        {/* Top bar – mobile first */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/60 backdrop-blur-sm">
+          <button onClick={() => setDrawerOpen(true)} className="text-white p-1">
+            <Menu size={24} />
+          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gold-400">KI</span>
+            <NodeTracker compact />
+          </div>
+          <Link href="/" className="text-gray-400 text-xs">Exit</Link>
+        </div>
+
+        {/* Drawer (slide-out menu) */}
+        <div className={`fixed inset-y-0 left-0 z-50 w-80 bg-black/95 backdrop-blur-xl border-r border-white/10 transform transition-transform duration-300 ease-out ${drawerOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="flex flex-col h-full">
+            <div className="flex justify-between items-center p-4 border-b border-white/10">
+              <h2 className="text-gold-400 font-semibold">Conversations</h2>
+              <button onClick={() => setDrawerOpen(false)} className="text-white p-1">
+                <X size={20} />
+              </button>
             </div>
             <div className="flex-1 overflow-y-auto p-2 space-y-1">
               {conversations.map(conv => (
                 <div key={conv.id} className="group relative">
-                  <Link
-                    href={`/chat?id=${conv.id}`}
-                    className={`block px-3 py-2 rounded-lg text-sm truncate ${currentConv?.id === conv.id ? 'bg-white/10 text-gold-400' : 'text-gray-300 hover:bg-white/5'}`}
-                  >
-                    {conv.title}
-                  </Link>
-                  <button
-                    onClick={(e) => { e.preventDefault(); setDropdownOpen(dropdownOpen === conv.id ? null : conv.id); }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white"
-                  >
-                    ⋮
-                  </button>
-                  {dropdownOpen === conv.id && (
-                    <div className="absolute right-2 top-full mt-1 bg-black/90 backdrop-blur-md rounded-lg shadow-lg border border-white/10 z-30 min-w-[120px]">
-                      <button onClick={() => { const newTitle = prompt('Enter new title:', conv.title); if (newTitle) renameChat(conv.id, newTitle); }} className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/10">Rename</button>
-                      <button onClick={() => deleteChat(conv.id)} className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/10">Delete</button>
-                    </div>
+                  {editingId === conv.id ? (
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={e => setEditTitle(e.target.value)}
+                      onBlur={() => renameChat(conv.id, editTitle)}
+                      onKeyDown={e => e.key === 'Enter' && renameChat(conv.id, editTitle)}
+                      className="w-full px-3 py-2 rounded-lg bg-white/10 text-sm focus:outline-none focus:ring-1 focus:ring-gold-400"
+                      autoFocus
+                    />
+                  ) : (
+                    <Link
+                      href={`/chat?id=${conv.id}`}
+                      onClick={() => setDrawerOpen(false)}
+                      className={`block px-3 py-2 rounded-lg text-sm truncate ${currentConv?.id === conv.id ? 'bg-gold-500/20 text-gold-400' : 'text-gray-300 hover:bg-white/5'}`}
+                    >
+                      {conv.title}
+                    </Link>
                   )}
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                    <button
+                      onClick={() => { setEditingId(conv.id); setEditTitle(conv.title); }}
+                      className="p-1 text-gray-400 hover:text-white"
+                    >
+                      <Edit2 size={14} />
+                    </button>
+                    <button
+                      onClick={() => deleteChat(conv.id)}
+                      className="p-1 text-gray-400 hover:text-red-400"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
             <div className="p-4 border-t border-white/10">
-              <button onClick={newChat} className="w-full py-2 rounded-full bg-gradient-to-r from-cyan-600 to-gold-600 text-white font-semibold hover:scale-105 transition">+ New Chat</button>
+              <button
+                onClick={newChat}
+                className="w-full py-2 rounded-full bg-gradient-to-r from-cyan-600 to-gold-600 text-white font-semibold flex items-center justify-center gap-2 hover:scale-105 transition"
+              >
+                <Plus size={18} /> New Chat
+              </button>
             </div>
-          </>
-        )}
-      </div>
-
-      {/* Main chat area */}
-      <div className="flex-1 flex flex-col h-full">
-        <div className="p-4 border-b border-white/10 flex justify-between items-center bg-black/40 backdrop-blur-sm">
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-400 hover:text-white">{sidebarOpen ? '◀' : '▶'}</button>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gold-400">Kalki Intelligency</span>
-            <Link href="/" className="text-xs text-gray-400 hover:text-white">← Back to Home</Link>
           </div>
-          <div className="w-8" />
         </div>
-        <div className="flex-1 overflow-hidden p-4">
+
+        {/* Chat area */}
+        <div className="flex-1 overflow-hidden">
           <ChatInterface
             conversationId={currentConv.id}
             messages={currentConv.messages || []}
@@ -208,13 +232,22 @@ Answer questions about web development, digital marketing, AI automation, SEO, s
           />
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
 export default function ChatPage() {
+  useEffect(() => {
+    document.body.classList.add('chat-page');
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.classList.remove('chat-page');
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gold-400 bg-black">Loading conversation...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gold-400 bg-black">Loading...</div>}>
       <ChatContent />
     </Suspense>
   );

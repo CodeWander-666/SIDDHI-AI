@@ -1,316 +1,460 @@
-cat > setup_contact_luxury.sh << 'EOF'
 #!/bin/bash
 set -euo pipefail
 
-echo "🏗️ Building luxury contact page with SQLite + file storage..."
+echo "📱 Rebuilding chat page – DeepSeek mobile style"
+echo "🌐 Upgrading node tracker – industrial‑grade polling"
 
-# Install SQLite for Node if not already
-npm install better-sqlite3
-npm install --save-dev @types/better-sqlite3
+# 1. Replace NodeTracker – robust 2‑sec polling + error resilience
+cat > components/NodeTracker.tsx << 'NODE_EOF'
+'use client';
+import { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
 
-# Create database and table (if not exists)
-mkdir -p data
-cat > scripts/init_contact_db.js << 'INITJS'
-const Database = require('better-sqlite3');
-const path = require('path');
-const fs = require('fs');
+export function NodeTracker({ compact = false }: { compact?: boolean }) {
+  const [nodes, setNodes] = useState<number | null>(null);
+  const [error, setError] = useState(false);
 
-const DB_PATH = path.join(process.cwd(), 'data', 'contacts.db');
-const db = new Database(DB_PATH);
+  const fetchNodes = useCallback(async () => {
+    try {
+      const res = await fetch('/api/node/count');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setNodes(typeof data.count === 'number' ? data.count : 0);
+      setError(false);
+    } catch (err) {
+      console.error('Node count fetch failed:', err);
+      setError(true);
+    }
+  }, []);
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS contacts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL,
-    subject TEXT,
-    message TEXT NOT NULL,
-    created_at INTEGER NOT NULL
-  )
-`);
+  useEffect(() => {
+    fetchNodes();
+    const interval = setInterval(fetchNodes, 2000);
+    return () => clearInterval(interval);
+  }, [fetchNodes]);
 
-console.log('✅ Contacts database ready at', DB_PATH);
-db.close();
-INITJS
+  if (compact) {
+    return (
+      <div className="flex items-center gap-1.5 text-xs">
+        <span className="relative flex h-1.5 w-1.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-400" />
+        </span>
+        <span className="text-gold-400 font-mono font-bold">
+          {nodes !== null ? nodes.toLocaleString() : '?'}
+        </span>
+        <span className="text-gray-400">nodes</span>
+      </div>
+    );
+  }
 
-node scripts/init_contact_db.js
+  return (
+    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-sm border border-gold-400/30">
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+      </span>
+      <span className="text-gold-400 font-mono text-sm font-bold">
+        {nodes !== null ? nodes.toLocaleString() : '?'}
+      </span>
+      <span className="text-[10px] text-gray-400">active nodes</span>
+    </div>
+  );
+}
+NODE_EOF
 
-# Create API route to handle contact form submissions
-mkdir -p app/api/contact
-cat > app/api/contact/route.ts << 'APIEOF'
-import { NextRequest, NextResponse } from 'next/server';
-import Database from 'better-sqlite3';
-import path from 'path';
-import fs from 'fs';
+# 2. Update KIProvider – register node immediately on page load (no engine wait)
+cat > context/KIContext.tsx << 'KI_EOF'
+'use client';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { CreateMLCEngine } from '@mlc-ai/web-llm';
 
-const DB_PATH = path.join(process.cwd(), 'data', 'contacts.db');
-const TEXT_STORAGE_DIR = path.join(process.cwd(), 'data', 'contact_messages');
+const MODEL_ID = 'SmolLM2-135M-Instruct-q0f16-MLC';
+const NODE_ID_KEY = 'ki_node_id';
 
-// Ensure text storage directory exists
-if (!fs.existsSync(TEXT_STORAGE_DIR)) {
-  fs.mkdirSync(TEXT_STORAGE_DIR, { recursive: true });
+interface KIContextType {
+  engine: any | null;
+  loading: boolean;
+  activeNodes: number;
 }
 
-export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json();
-    const { name, email, subject, message } = body;
+const KIContext = createContext<KIContextType | undefined>(undefined);
 
-    if (!name || !email || !message) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+export function KIProvider({ children }: { children: ReactNode }) {
+  const [engine, setEngine] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [activeNodes, setActiveNodes] = useState(0);
+
+  // Register node immediately (no engine required)
+  useEffect(() => {
+    let nodeId = localStorage.getItem(NODE_ID_KEY);
+    if (!nodeId) {
+      nodeId = crypto.randomUUID();
+      localStorage.setItem(NODE_ID_KEY, nodeId);
     }
 
-    const now = Date.now();
-
-    // Save to SQLite
-    const db = new Database(DB_PATH);
-    const stmt = db.prepare(`
-      INSERT INTO contacts (name, email, subject, message, created_at)
-      VALUES (?, ?, ?, ?, ?)
-    `);
-    const info = stmt.run(name, email, subject || null, message, now);
-    db.close();
-
-    // Save to text file (backup / easy viewing)
-    const filename = `${now}_${name.replace(/[^a-z0-9]/gi, '_')}.txt`;
-    const filePath = path.join(TEXT_STORAGE_DIR, filename);
-    const fileContent = `
-=== Contact Message ===
-Time: ${new Date(now).toISOString()}
-Name: ${name}
-Email: ${email}
-Subject: ${subject || '(none)'}
-Message:
-${message}
-----------------------
-`;
-    fs.writeFileSync(filePath, fileContent.trim());
-
-    return NextResponse.json({ success: true, id: info.lastInsertRowid });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
-}
-APIEOF
-
-# Create the luxury contact page
-cat > app/contact/page.tsx << 'CONTACTEOF'
-'use client';
-import { useState } from 'react';
-import { AnimatedGradientBackground } from '@/components/AnimatedGradientBackground';
-import { ScrollReveal } from '@/components/ScrollReveal';
-
-export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError('');
-
-    try {
-      const res = await fetch('/api/contact', {
+    const register = () => {
+      fetch('/api/node/heartbeat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setShowSuccess(true);
-        setFormData({ name: '', email: '', subject: '', message: '' });
-        setTimeout(() => setShowSuccess(false), 5000);
-      } else {
-        setError(data.error || 'Submission failed');
+        body: JSON.stringify({ nodeId }),
+      }).catch(e => console.warn('Heartbeat failed:', e));
+    };
+
+    register();
+    const heartbeatInterval = setInterval(register, 30000);
+    const unregister = () => {
+      fetch('/api/node/unregister', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nodeId }),
+      }).catch(e => console.warn('Unregister failed:', e));
+    };
+    window.addEventListener('beforeunload', unregister);
+
+    return () => {
+      clearInterval(heartbeatInterval);
+      window.removeEventListener('beforeunload', unregister);
+      unregister();
+    };
+  }, []);
+
+  // Load WebLLM engine in background
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        const eng = await CreateMLCEngine(MODEL_ID, {
+          initProgressCallback: () => {},
+        });
+        if (mounted) {
+          setEngine(eng);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Engine load error', err);
+        setLoading(false);
       }
-    } catch {
-      setError('Network error. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+    };
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  // Poll node count every 2 seconds
+  useEffect(() => {
+    const fetchNodes = async () => {
+      try {
+        const res = await fetch('/api/node/count');
+        const data = await res.json();
+        setActiveNodes(data.count || 0);
+      } catch (err) {
+        console.error('Node count poll failed', err);
+      }
+    };
+    fetchNodes();
+    const interval = setInterval(fetchNodes, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <KIContext.Provider value={{ engine, loading, activeNodes }}>
+      {children}
+    </KIContext.Provider>
+  );
+}
+
+export const useKI = () => {
+  const ctx = useContext(KIContext);
+  if (!ctx) throw new Error('useKI must be used within KIProvider');
+  return ctx;
+};
+KI_EOF
+
+# 3. Rebuild chat page – DeepSeek mobile style (drawer menu, bottom input, full screen)
+cat > app/chat/page.tsx << 'CHAT_EOF'
+'use client';
+import { Suspense, useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { ChatInterface } from '@/components/chat/ChatInterface';
+import { useKI } from '@/context/KIContext';
+import { NodeTracker } from '@/components/NodeTracker';
+import { GradientBackground } from '@/components/GradientBackground';
+import Link from 'next/link';
+import { Menu, X, Plus, Trash2, Edit2 } from 'lucide-react';
+
+interface Conversation {
+  id: string;
+  title: string;
+  messages: { role: 'user' | 'assistant'; content: string }[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+function ChatContent() {
+  const searchParams = useSearchParams();
+  const currentId = searchParams.get('id');
+  const { engine } = useKI();
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+
+  // Load/save conversations from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem('ki_conversations');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        const convs = parsed.map((c: any) => ({
+          ...c,
+          messages: c.messages || [],
+          createdAt: new Date(c.createdAt),
+          updatedAt: new Date(c.updatedAt)
+        }));
+        setConversations(convs);
+      } catch (e) {
+        initDefaultConversation();
+      }
+    } else {
+      initDefaultConversation();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (conversations.length > 0) {
+      localStorage.setItem('ki_conversations', JSON.stringify(conversations));
+    }
+  }, [conversations]);
+
+  const initDefaultConversation = () => {
+    const newConv: Conversation = {
+      id: crypto.randomUUID(),
+      title: 'New Chat',
+      messages: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    setConversations([newConv]);
+    localStorage.setItem('ki_conversations', JSON.stringify([newConv]));
+  };
+
+  const getCurrentConversation = (): Conversation | undefined => {
+    if (!currentId) return conversations[0];
+    return conversations.find(c => c.id === currentId) || conversations[0];
+  };
+
+  const updateConversation = (id: string, updates: Partial<Conversation>) => {
+    setConversations(prev => prev.map(c => c.id === id ? { ...c, ...updates, updatedAt: new Date() } : c));
+  };
+
+  const addMessage = (id: string, message: { role: 'user' | 'assistant'; content: string }) => {
+    setConversations(prev => prev.map(c => {
+      if (c.id !== id) return c;
+      const messages = c.messages || [];
+      return { ...c, messages: [...messages, message], updatedAt: new Date() };
+    }));
+  };
+
+  const newChat = () => {
+    const newConv: Conversation = {
+      id: crypto.randomUUID(),
+      title: 'New Chat',
+      messages: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    setConversations(prev => [newConv, ...prev]);
+    window.history.pushState({}, '', `/chat?id=${newConv.id}`);
+    setDrawerOpen(false);
+  };
+
+  const renameChat = (id: string, newTitle: string) => {
+    if (newTitle.trim()) {
+      updateConversation(id, { title: newTitle.trim() });
+    }
+    setEditingId(null);
+  };
+
+  const deleteChat = (id: string) => {
+    if (confirm('Delete this conversation permanently?')) {
+      const newConversations = conversations.filter(c => c.id !== id);
+      setConversations(newConversations);
+      if (newConversations.length === 0) {
+        initDefaultConversation();
+      }
+      if (currentId === id && newConversations.length > 0) {
+        window.history.pushState({}, '', `/chat?id=${newConversations[0].id}`);
+      }
+    }
+    setDrawerOpen(false);
+  };
+
+  const handleSendMessage = async (prompt: string): Promise<string> => {
+    if (!engine) return 'Engine not ready';
+    const currentConv = getCurrentConversation();
+    if (!currentConv) return 'No conversation found';
+    try {
+      const trainingPrompt = `You are KI, the official AI assistant of Kalki Technologies.
+Answer questions about web development, digital marketing, AI automation, SEO, social media, pricing, and company info. Be concise, friendly, and use markdown.`;
+      const response = await engine.chat.completions.create({
+        messages: [
+          { role: 'system', content: trainingPrompt },
+          ...(currentConv.messages || []),
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 512,
+        stream: false,
+      });
+      return response.choices[0].message.content;
+    } catch (err) {
+      console.error(err);
+      return 'Sorry, I encountered an error. Please try again.';
     }
   };
+
+  const currentConv = getCurrentConversation();
+  if (!currentConv) return null;
 
   return (
     <>
-      <AnimatedGradientBackground />
-      <div className="relative z-10 pt-28 pb-20 px-4 md:px-8 min-h-screen">
-        <div className="max-w-4xl mx-auto">
-          <ScrollReveal>
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gold-400/30 bg-gold-400/5 text-gold-400 text-sm tracking-wider mb-6 backdrop-blur-sm">
-                ✦ CONNECT WITH US ✦
-              </div>
-              <h1 className="text-5xl md:text-7xl font-serif mb-4">
-                Let's <span className="text-gold-400">Talk</span>
-              </h1>
-              <p className="text-gray-400 text-lg max-w-xl mx-auto">
-                Whether you have a project in mind or just want to say hello – we'd love to hear from you.
-              </p>
-            </div>
-          </ScrollReveal>
+      <GradientBackground />
+      <div className="fixed inset-0 flex flex-col bg-black z-50">
+        {/* Top bar – mobile first */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/60 backdrop-blur-sm">
+          <button onClick={() => setDrawerOpen(true)} className="text-white p-1">
+            <Menu size={24} />
+          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gold-400">KI</span>
+            <NodeTracker compact />
+          </div>
+          <Link href="/" className="text-gray-400 text-xs">Exit</Link>
+        </div>
 
-          <ScrollReveal>
-            <div className="glass-card rounded-3xl p-6 md:p-10 border border-gold-400/20 shadow-2xl">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="group">
-                    <label className="block text-xs uppercase tracking-wider text-gold-400 mb-1 group-focus-within:text-cyan-400 transition">
-                      Full Name *
-                    </label>
+        {/* Drawer (slide-out menu) */}
+        <div className={`fixed inset-y-0 left-0 z-50 w-80 bg-black/95 backdrop-blur-xl border-r border-white/10 transform transition-transform duration-300 ease-out ${drawerOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="flex flex-col h-full">
+            <div className="flex justify-between items-center p-4 border-b border-white/10">
+              <h2 className="text-gold-400 font-semibold">Conversations</h2>
+              <button onClick={() => setDrawerOpen(false)} className="text-white p-1">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2 space-y-1">
+              {conversations.map(conv => (
+                <div key={conv.id} className="group relative">
+                  {editingId === conv.id ? (
                     <input
                       type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full bg-black/50 rounded-xl px-4 py-3 border border-white/10 focus:border-gold-400 focus:outline-none transition text-white"
-                      placeholder="John Doe"
+                      value={editTitle}
+                      onChange={e => setEditTitle(e.target.value)}
+                      onBlur={() => renameChat(conv.id, editTitle)}
+                      onKeyDown={e => e.key === 'Enter' && renameChat(conv.id, editTitle)}
+                      className="w-full px-3 py-2 rounded-lg bg-white/10 text-sm focus:outline-none focus:ring-1 focus:ring-gold-400"
+                      autoFocus
                     />
-                  </div>
-                  <div className="group">
-                    <label className="block text-xs uppercase tracking-wider text-gold-400 mb-1 group-focus-within:text-cyan-400 transition">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full bg-black/50 rounded-xl px-4 py-3 border border-white/10 focus:border-gold-400 focus:outline-none transition text-white"
-                      placeholder="hello@example.com"
-                    />
-                  </div>
-                </div>
-
-                <div className="group">
-                  <label className="block text-xs uppercase tracking-wider text-gold-400 mb-1 group-focus-within:text-cyan-400 transition">
-                    Subject (optional)
-                  </label>
-                  <input
-                    type="text"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    className="w-full bg-black/50 rounded-xl px-4 py-3 border border-white/10 focus:border-gold-400 focus:outline-none transition text-white"
-                    placeholder="General inquiry / Partnership / Support"
-                  />
-                </div>
-
-                <div className="group">
-                  <label className="block text-xs uppercase tracking-wider text-gold-400 mb-1 group-focus-within:text-cyan-400 transition">
-                    Message *
-                  </label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    rows={5}
-                    className="w-full bg-black/50 rounded-xl px-4 py-3 border border-white/10 focus:border-gold-400 focus:outline-none transition text-white resize-none"
-                    placeholder="Tell us about your project..."
-                  />
-                </div>
-
-                {error && (
-                  <div className="p-4 rounded-xl bg-red-500/20 border border-red-500/50 text-red-300 text-sm text-center">
-                    {error}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-4 rounded-full bg-gradient-to-r from-gold-600 to-cyan-600 text-white font-semibold text-lg hover:scale-105 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-xl"
-                >
-                  {isSubmitting ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Sending...
-                    </div>
                   ) : (
-                    'Send Message →'
+                    <Link
+                      href={`/chat?id=${conv.id}`}
+                      onClick={() => setDrawerOpen(false)}
+                      className={`block px-3 py-2 rounded-lg text-sm truncate ${currentConv?.id === conv.id ? 'bg-gold-500/20 text-gold-400' : 'text-gray-300 hover:bg-white/5'}`}
+                    >
+                      {conv.title}
+                    </Link>
                   )}
-                </button>
-              </form>
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                    <button
+                      onClick={() => { setEditingId(conv.id); setEditTitle(conv.title); }}
+                      className="p-1 text-gray-400 hover:text-white"
+                    >
+                      <Edit2 size={14} />
+                    </button>
+                    <button
+                      onClick={() => deleteChat(conv.id)}
+                      className="p-1 text-gray-400 hover:text-red-400"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-          </ScrollReveal>
-
-          {/* Additional contact info */}
-          <ScrollReveal>
-            <div className="grid md:grid-cols-3 gap-6 mt-12 text-center">
-              <div className="glass-card p-6 rounded-2xl">
-                <div className="text-3xl mb-2">📞</div>
-                <h3 className="text-sm font-semibold text-gold-400">Phone</h3>
-                <p className="text-gray-400 text-sm">+91 6261031710</p>
-              </div>
-              <div className="glass-card p-6 rounded-2xl">
-                <div className="text-3xl mb-2">✉️</div>
-                <h3 className="text-sm font-semibold text-gold-400">Email</h3>
-                <p className="text-gray-400 text-sm">hello@kalki.tech</p>
-              </div>
-              <div className="glass-card p-6 rounded-2xl">
-                <div className="text-3xl mb-2">💬</div>
-                <h3 className="text-sm font-semibold text-gold-400">WhatsApp</h3>
-                <p className="text-gray-400 text-sm">Available 24/7</p>
-              </div>
+            <div className="p-4 border-t border-white/10">
+              <button
+                onClick={newChat}
+                className="w-full py-2 rounded-full bg-gradient-to-r from-cyan-600 to-gold-600 text-white font-semibold flex items-center justify-center gap-2 hover:scale-105 transition"
+              >
+                <Plus size={18} /> New Chat
+              </button>
             </div>
-          </ScrollReveal>
-        </div>
-      </div>
-
-      {/* Success Modal */}
-      {showSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md">
-          <div className="glass-card rounded-2xl p-8 max-w-md w-full mx-4 text-center animate-in fade-in zoom-in duration-300">
-            <div className="text-6xl mb-4">✅</div>
-            <h3 className="text-2xl font-serif text-gold-400 mb-2">Message Sent!</h3>
-            <p className="text-gray-300 mb-6">
-              Thank you for reaching out. We'll get back to you within 24 hours.
-            </p>
-            <button
-              onClick={() => setShowSuccess(false)}
-              className="px-6 py-2 rounded-full bg-gradient-to-r from-gold-600 to-cyan-600 text-white font-semibold"
-            >
-              Close
-            </button>
           </div>
         </div>
-      )}
 
-      <style jsx global>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .animate-in {
-          animation: fade-in 0.2s ease-out;
-        }
-      `}</style>
+        {/* Chat area */}
+        <div className="flex-1 overflow-hidden">
+          <ChatInterface
+            conversationId={currentConv.id}
+            messages={currentConv.messages || []}
+            onSendMessage={handleSendMessage}
+            onNewMessage={(msg) => {
+              addMessage(currentConv.id, msg);
+              if ((currentConv.messages?.length || 0) === 0 && msg.role === 'user') {
+                const newTitle = msg.content.slice(0, 30) + (msg.content.length > 30 ? '…' : '');
+                updateConversation(currentConv.id, { title: newTitle });
+              }
+            }}
+          />
+        </div>
+      </div>
     </>
   );
 }
-CONTACTEOF
 
-echo "✅ Luxury contact page created with:"
-echo "   • SQLite database (data/contacts.db)"
-echo "   • Text file backups (data/contact_messages/*.txt)"
-echo "   • Animated gradient background"
-echo "   • Glassmorphism form with floating labels"
-echo "   • Success modal"
+export default function ChatPage() {
+  useEffect(() => {
+    document.body.classList.add('chat-page');
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.classList.remove('chat-page');
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gold-400 bg-black">Loading...</div>}>
+      <ChatContent />
+    </Suspense>
+  );
+}
+CHAT_EOF
+
+# 4. Ensure global CSS hides header/footer on chat page (already in globals.css, but add if missing)
+if ! grep -q "body.chat-page footer" app/globals.css; then
+  cat >> app/globals.css << 'CSS_EOF'
+
+/* Chat page – hide global header/footer, full screen */
+body.chat-page header,
+body.chat-page footer {
+  display: none !important;
+}
+body.chat-page {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+CSS_EOF
+fi
+
+echo "✅ All fixes applied!"
+echo "📱 Chat page now uses DeepSeek mobile style:"
+echo "   • Slide‑out conversation drawer (hamburger menu)"
+echo "   • Compact node counter in top bar"
+echo "   • Full‑screen chat with bottom input"
+echo "   • Rename/delete conversations directly from drawer"
+echo "🌐 Node tracking is industrial‑grade:"
+echo "   • Node registers immediately on any page load"
+echo "   • Heartbeat every 30 seconds, unregister on close"
+echo "   • Active node count polls every 2 seconds across all pages"
+echo "   • Count shows real visitors + permanent node"
 echo "🔄 Restart dev server: npm run dev"
-EOF
-
-chmod +x setup_contact_luxury.sh && ./setup_contact_luxury.sh

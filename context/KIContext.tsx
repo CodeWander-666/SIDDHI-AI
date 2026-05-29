@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { CreateMLCEngine } from '@mlc-ai/web-llm';
 
 const MODEL_ID = 'SmolLM2-135M-Instruct-q0f16-MLC';
+const NODE_ID_KEY = 'ki_node_id';
 
 interface KIContextType {
   engine: any | null;
@@ -17,7 +18,41 @@ export function KIProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [activeNodes, setActiveNodes] = useState(0);
 
-  // Load WebLLM engine silently
+  // Register node immediately (no engine required)
+  useEffect(() => {
+    let nodeId = localStorage.getItem(NODE_ID_KEY);
+    if (!nodeId) {
+      nodeId = crypto.randomUUID();
+      localStorage.setItem(NODE_ID_KEY, nodeId);
+    }
+
+    const register = () => {
+      fetch('/api/node/heartbeat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nodeId }),
+      }).catch(e => console.warn('Heartbeat failed:', e));
+    };
+
+    register();
+    const heartbeatInterval = setInterval(register, 30000);
+    const unregister = () => {
+      fetch('/api/node/unregister', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nodeId }),
+      }).catch(e => console.warn('Unregister failed:', e));
+    };
+    window.addEventListener('beforeunload', unregister);
+
+    return () => {
+      clearInterval(heartbeatInterval);
+      window.removeEventListener('beforeunload', unregister);
+      unregister();
+    };
+  }, []);
+
+  // Load WebLLM engine in background
   useEffect(() => {
     let mounted = true;
     const load = async () => {
@@ -30,7 +65,7 @@ export function KIProvider({ children }: { children: ReactNode }) {
           setLoading(false);
         }
       } catch (err) {
-        console.error(err);
+        console.error('Engine load error', err);
         setLoading(false);
       }
     };
@@ -38,19 +73,19 @@ export function KIProvider({ children }: { children: ReactNode }) {
     return () => { mounted = false; };
   }, []);
 
-  // Poll node count every 5 seconds (reliable, no WebSocket needed)
+  // Poll node count every 2 seconds
   useEffect(() => {
     const fetchNodes = async () => {
       try {
         const res = await fetch('/api/node/count');
         const data = await res.json();
-        setActiveNodes(data.count);
+        setActiveNodes(data.count || 0);
       } catch (err) {
-        console.error('Failed to fetch node count', err);
+        console.error('Node count poll failed', err);
       }
     };
     fetchNodes();
-    const interval = setInterval(fetchNodes, 5000);
+    const interval = setInterval(fetchNodes, 2000);
     return () => clearInterval(interval);
   }, []);
 

@@ -77,3 +77,15 @@ html { scroll-behavior: smooth; }
 .animate-border-pulse {
   animation: borderPulse 1s ease-in-out infinite;
 }
+
+/* Chat page specific styles */
+body.chat-page header,
+body.chat-page footer {
+  display: none !important;
+}
+body.chat-page {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
