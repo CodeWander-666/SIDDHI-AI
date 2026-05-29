@@ -61,3 +61,19 @@ html { scroll-behavior: smooth; }
   animation: gradient-x 3s ease infinite;
   background-size: 200% auto;
 }
+
+/* Animated border for chat when generating */
+@keyframes borderPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3), 0 0 15px rgba(255, 20, 147, 0.3);
+    border-color: rgba(0, 255, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.8), 0 0 40px rgba(255, 20, 147, 0.8);
+    border-color: rgba(255, 20, 147, 0.8);
+  }
+}
+
+.animate-border-pulse {
+  animation: borderPulse 1s ease-in-out infinite;
+}

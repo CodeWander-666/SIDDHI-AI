@@ -12,6 +12,9 @@ export async function GET() {
     } catch {}
     const now = Date.now();
     const active = Object.values(nodes).filter((ts: number) => now - ts < 120000).length;
-    return NextResponse.json({ count: active });
-  } catch { return NextResponse.json({ count: 0 }); }
+    const permanentNode = 1; // HF permanent node
+    return NextResponse.json({ count: active + permanentNode });
+  } catch {
+    return NextResponse.json({ count: 1 });
+  }
 }

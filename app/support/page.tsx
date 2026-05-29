@@ -1,66 +1,59 @@
-import { ScrollReveal } from '../../components/ScrollReveal';
-import { WebLLMChat } from '../../components/WebLLMChat';
+'use client';
+import { useEffect } from 'react';
+import { AnimatedGradientBackground } from '@/components/AnimatedGradientBackground';
+import { SupportChatInterface } from '@/components/support/SupportChatInterface';
 import Link from 'next/link';
 
 export default function SupportPage() {
+  useEffect(() => {
+    document.body.classList.add('support-page');
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.classList.remove('support-page');
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto">
-        <ScrollReveal>
-          <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1.5 rounded-full border border-gold-400/30 bg-gold-400/5 text-gold-400 text-sm tracking-wider mb-6">
-              ✦ 24/7 INTELLIGENT ASSISTANCE ✦
-            </span>
-            <h1 className="text-5xl md:text-7xl font-serif mb-4">
-              How can <span className="text-gold-400">KI help you</span> today?
-            </h1>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Your personal AI concierge is ready to answer any question – instantly, securely, and without any data leaving your device.
-            </p>
+    <>
+      <AnimatedGradientBackground />
+      <div className="fixed inset-0 flex flex-col z-10">
+        {/* Top bar */}
+        <div className="flex-shrink-0 pt-12 sm:pt-16 px-4 sm:px-6">
+          <div className="max-w-4xl mx-auto w-full">
+            <Link href="/" className="text-gold-400 text-sm hover:underline inline-flex items-center gap-1">
+              ← Back to Home
+            </Link>
           </div>
-        </ScrollReveal>
-
-        <ScrollReveal>
-          <WebLLMChat />
-        </ScrollReveal>
-
-        <ScrollReveal>
-          <div className="mt-16 text-center">
-            <div className="glass-card p-8 rounded-3xl inline-block max-w-2xl mx-auto">
-              <h3 className="text-2xl font-serif mb-2">Still have questions?</h3>
-              <p className="text-gray-400 mb-6">
-                You can also reach our human support team directly.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="https://wa.me/916261031710"
-                  className="px-6 py-3 rounded-full bg-gradient-to-r from-gold-600 to-cyan-600 text-white font-semibold hover:scale-105 transition"
-                >
-                  Contact Human Support
-                </Link>
-                <Link
-                  href="/docs"
-                  className="px-6 py-3 rounded-full border border-white/20 text-white hover:border-gold-400 hover:text-gold-400 transition"
-                >
-                  View Documentation
-                </Link>
-              </div>
-            </div>
+        </div>
+        {/* Chat container - takes remaining space */}
+        <div className="flex-1 min-h-0 px-3 sm:px-6 pb-4 sm:pb-6 mt-2">
+          <div className="max-w-4xl mx-auto w-full h-full glass-card rounded-2xl sm:rounded-3xl overflow-hidden border border-gold-400/20 shadow-2xl">
+            <SupportChatInterface />
           </div>
-        </ScrollReveal>
-
-        <ScrollReveal>
-          <div className="mt-20 text-center text-sm text-gray-500 border-t border-white/10 pt-8">
-            <span className="inline-flex items-center gap-2">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-400" />
-              </span>
-              Live KI-powered assistance – no data logged, total privacy.
-            </span>
-          </div>
-        </ScrollReveal>
+        </div>
+        {/* Disclaimer */}
+        <div className="flex-shrink-0 pb-4 text-center">
+          <p className="text-[10px] text-gray-500 px-2">
+            KI support is an AI assistant – it may make mistakes. For urgent issues, please WhatsApp us.
+          </p>
+        </div>
       </div>
-    </div>
+
+      <style jsx global>{`
+        body.support-page header,
+        body.support-page footer {
+          display: none !important;
+        }
+        body.support-page {
+          overflow: hidden;
+          position: fixed;
+          width: 100%;
+          height: 100%;
+        }
+      `}</style>
+    </>
   );
 }
