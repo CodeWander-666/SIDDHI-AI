@@ -1,5 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { CheckCircle, ThumbsUp, ThumbsDown, MessageCircle, Send } from 'lucide-react';
 
 interface Community {
   id: string;
@@ -40,108 +41,147 @@ export function CommunityChat() {
   const [newPostContent, setNewPostContent] = useState('');
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const pollInterval = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchCommunities = async () => {
-    const res = await fetch('/api/ki-community/communities');
-    const data = await res.json();
-    setCommunities(data);
-  };
-
-  const fetchPosts = async (communityId: string) => {
-    const res = await fetch(`/api/ki-community/posts?communityId=${communityId}`);
-    const data = await res.json();
-    setPosts(data);
-  };
-
-  const fetchComments = async (postId: string) => {
-    const res = await fetch(`/api/ki-community/comments?postId=${postId}`);
-    const data = await res.json();
-    setComments(prev => ({ ...prev, [postId]: data }));
-  };
-
-  useEffect(() => {
-    fetchCommunities();
-    const interval = setInterval(fetchCommunities, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (selectedCommunity) {
-      fetchPosts(selectedCommunity);
-      const interval = setInterval(() => fetchPosts(selectedCommunity), 3000);
-      return () => clearInterval(interval);
+  const fetchCommunities = useCallback(async () => {
+    try {
+      const res = await fetch('/api/ki-community/communities');
+      if (!res.ok) throw new Error('Failed to fetch communities');
+      const data = await res.json();
+      setCommunities(data);
+      if (!selectedCommunity && data.length) setSelectedCommunity(data[0].id);
+    } catch (err) {
+      console.error(err);
+      setError('Could not load communities. Please refresh.');
     }
   }, [selectedCommunity]);
 
+  const fetchPosts = useCallback(async (communityId: string) => {
+    try {
+      const res = await fetch(`/api/ki-community/posts?communityId=${communityId}`);
+      if (!res.ok) throw new Error('Failed to fetch posts');
+      const data = await res.json();
+      setPosts(data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const fetchComments = useCallback(async (postId: string) => {
+    try {
+      const res = await fetch(`/api/ki-community/comments?postId=${postId}`);
+      if (!res.ok) throw new Error('Failed to fetch comments');
+      const data = await res.json();
+      setComments(prev => ({ ...prev, [postId]: data }));
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  // Poll every 3 seconds for new posts/comments (real‑time feel)
+  useEffect(() => {
+    if (selectedCommunity) {
+      fetchPosts(selectedCommunity);
+      pollInterval.current = setInterval(() => fetchPosts(selectedCommunity), 3000);
+      return () => {
+        if (pollInterval.current) clearInterval(pollInterval.current);
+      };
+    }
+  }, [selectedCommunity, fetchPosts]);
+
+  useEffect(() => {
+    fetchCommunities();
+    const commInterval = setInterval(fetchCommunities, 10000);
+    return () => clearInterval(commInterval);
+  }, [fetchCommunities]);
+
   const createCommunity = async () => {
     if (!newCommunityName.trim()) return;
-    await fetch('/api/ki-community/communities', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: crypto.randomUUID(),
-        name: newCommunityName,
-        description: newCommunityDesc,
-      }),
-    });
-    setNewCommunityName('');
-    setNewCommunityDesc('');
-    setShowCreate(false);
-    fetchCommunities();
+    setLoading(true);
+    try {
+      const res = await fetch('/api/ki-community/communities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: crypto.randomUUID(), name: newCommunityName, description: newCommunityDesc }),
+      });
+      if (!res.ok) throw new Error('Failed to create community');
+      setNewCommunityName('');
+      setNewCommunityDesc('');
+      setShowCreate(false);
+      fetchCommunities();
+    } catch (err) {
+      console.error(err);
+      setError('Could not create community.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const createPost = async () => {
     if (!selectedCommunity || !newPostTitle.trim()) return;
-    await fetch('/api/ki-community/posts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: crypto.randomUUID(),
-        communityId: selectedCommunity,
-        author: 'User',
-        title: newPostTitle,
-        content: newPostContent,
-      }),
-    });
-    setNewPostTitle('');
-    setNewPostContent('');
-    fetchPosts(selectedCommunity);
+    setLoading(true);
+    try {
+      const res = await fetch('/api/ki-community/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: crypto.randomUUID(),
+          communityId: selectedCommunity,
+          author: 'User',
+          title: newPostTitle,
+          content: newPostContent,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to create post');
+      setNewPostTitle('');
+      setNewPostContent('');
+      fetchPosts(selectedCommunity);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const votePost = async (postId: string, type: 'up' | 'down') => {
-    await fetch('/api/ki-community/posts/vote', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ postId, type }),
-    });
-    fetchPosts(selectedCommunity!);
+    try {
+      await fetch('/api/ki-community/posts/vote', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postId, type }),
+      });
+      // Optimistic update
+      setPosts(prev => prev.map(p => p.id === postId ? { ...p, upvotes: p.upvotes + (type === 'up' ? 1 : 0), downvotes: p.downvotes + (type === 'down' ? 1 : 0) } : p));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const addComment = async (postId: string) => {
     if (!newComment.trim()) return;
-    await fetch('/api/ki-community/comments', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: crypto.randomUUID(),
-        postId,
-        author: 'User',
-        content: newComment,
-      }),
-    });
-    setNewComment('');
-    setReplyingTo(null);
-    fetchComments(postId);
+    try {
+      const res = await fetch('/api/ki-community/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: crypto.randomUUID(),
+          postId,
+          author: 'User',
+          content: newComment,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to add comment');
+      setNewComment('');
+      setReplyingTo(null);
+      fetchComments(postId);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const voteComment = async (commentId: string, postId: string, type: 'up' | 'down') => {
-    await fetch('/api/ki-community/comments/vote', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ commentId, type }),
-    });
-    fetchComments(postId);
-  };
+  if (error) return <div className="text-red-400 text-center p-4">{error}</div>;
 
   return (
     <div className="space-y-6">
@@ -154,7 +194,7 @@ export function CommunityChat() {
         <div className="glass-card p-4 rounded-xl space-y-3">
           <input type="text" placeholder="Community name" value={newCommunityName} onChange={e => setNewCommunityName(e.target.value)} className="w-full bg-black/50 rounded-lg px-3 py-2 border border-white/10" />
           <textarea placeholder="Description" value={newCommunityDesc} onChange={e => setNewCommunityDesc(e.target.value)} className="w-full bg-black/50 rounded-lg px-3 py-2 border border-white/10" rows={2} />
-          <button onClick={createCommunity} className="bg-gold-600 px-4 py-2 rounded-full text-sm">Create</button>
+          <button onClick={createCommunity} disabled={loading} className="bg-gold-600 px-4 py-2 rounded-full text-sm">Create</button>
         </div>
       )}
 
@@ -172,7 +212,7 @@ export function CommunityChat() {
             <div className="glass-card p-4 rounded-xl mb-6">
               <input type="text" placeholder="Post title" value={newPostTitle} onChange={e => setNewPostTitle(e.target.value)} className="w-full bg-black/50 rounded-lg px-3 py-2 mb-2" />
               <textarea placeholder="Content" value={newPostContent} onChange={e => setNewPostContent(e.target.value)} className="w-full bg-black/50 rounded-lg px-3 py-2" rows={3} />
-              <button onClick={createPost} className="mt-2 bg-cyan-600 px-4 py-2 rounded-full text-sm">Create Post</button>
+              <button onClick={createPost} disabled={loading} className="mt-2 bg-cyan-600 px-4 py-2 rounded-full text-sm">Create Post</button>
             </div>
 
             {posts.map(post => (
@@ -180,21 +220,17 @@ export function CommunityChat() {
                 <h3 className="text-xl font-semibold">{post.title}</h3>
                 <p className="text-gray-300 mt-1">{post.content}</p>
                 <div className="flex gap-4 mt-3 text-sm">
-                  <button onClick={() => votePost(post.id, 'up')}>👍 {post.upvotes}</button>
-                  <button onClick={() => votePost(post.id, 'down')}>👎 {post.downvotes}</button>
-                  <button onClick={async () => {
-                    setReplyingTo(replyingTo === post.id ? null : post.id);
-                    await fetchComments(post.id);
-                  }}>💬 Reply ({comments[post.id]?.length || 0})</button>
+                  <button onClick={() => votePost(post.id, 'up')} className="flex items-center gap-1 hover:text-cyan-400">👍 {post.upvotes}</button>
+                  <button onClick={() => votePost(post.id, 'down')} className="flex items-center gap-1 hover:text-red-400">👎 {post.downvotes}</button>
+                  <button onClick={() => { setReplyingTo(replyingTo === post.id ? null : post.id); fetchComments(post.id); }} className="flex items-center gap-1 hover:text-gold-400">💬 {comments[post.id]?.length || 0} comments</button>
                 </div>
                 {replyingTo === post.id && (
                   <div className="mt-3 space-y-3">
                     {comments[post.id]?.map(comment => (
                       <div key={comment.id} className="bg-white/5 p-3 rounded-lg">
                         <p className="text-sm">{comment.content}</p>
-                        <div className="flex gap-2 mt-1 text-xs">
-                          <button onClick={() => voteComment(comment.id, post.id, 'up')}>👍 {comment.upvotes}</button>
-                          <button onClick={() => voteComment(comment.id, post.id, 'down')}>👎 {comment.downvotes}</button>
+                        <div className="flex gap-2 mt-1 text-xs text-gray-400">
+                          <span>👍 {comment.upvotes}</span> <span>👎 {comment.downvotes}</span>
                         </div>
                       </div>
                     ))}
