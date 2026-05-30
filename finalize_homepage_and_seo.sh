@@ -1,3 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+
+echo "🎯 Updating homepage with six service cards linking to dedicated pages..."
+echo "🔐 Ensuring Google verification meta tag is in layout..."
+
+# 1. Update the homepage
+cat > app/page.tsx << 'HOMEPAGE'
 'use client';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { ServiceCard } from '../components/ServiceCard';
@@ -175,3 +183,31 @@ export default function Home() {
     </>
   );
 }
+HOMEPAGE
+
+echo "✅ Homepage updated with six service cards linking to dedicated pages."
+
+# 2. Ensure Google verification meta tag is present (idempotent)
+LAYOUT="app/layout.tsx"
+META='<meta name="google-site-verification" content="mXzGHeQy9yGNuw8JTuzgXdDUn-gUcj4C65Jt83rcK9A" />'
+
+# Remove any existing duplicate lines
+sed -i '/google-site-verification/d' "$LAYOUT"
+
+# Insert right after <head> tag
+sed -i "/<head>/a \\  ${META}" "$LAYOUT"
+
+echo "✅ Google verification meta tag added/updated in $LAYOUT."
+
+# 3. Clean and rebuild
+echo "🧹 Cleaning .next cache..."
+rm -rf .next
+
+echo "🏗️ Rebuilding project..."
+npm run build
+
+echo ""
+echo "🎉 All done!"
+echo "   • Homepage cards now link to /services/seo, /services/social-media, /services/gmb-seo, /services/linkedin, /services/web-development, /services/ai-automation"
+echo "   • Google verification meta tag is in place."
+echo "   • Build succeeded. Run 'npm run dev' to test locally, or deploy to production."

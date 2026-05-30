@@ -1,4 +1,3 @@
-cat > final_fix_seo_and_build.sh << 'EOF'
 #!/bin/bash
 set -euo pipefail
 
@@ -196,7 +195,3 @@ echo "   • Google verification meta tag is in layout"
 echo "   • All service pages have proper 'use client' order"
 echo ""
 echo "🚀 Deploy to Vercel and submit sitemap in Google Search Console."
-EOF
-
-chmod +x final_fix_seo_and_build.sh
-./final_fix_seo_and_build.sh

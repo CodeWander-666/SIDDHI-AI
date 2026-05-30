@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
-
 export const metadata: Metadata = {
-  title: 'SEO Dominant | Kalki Technologies',
-  description: 'Rank #1, Stay #1. Guaranteed ROI. Free consultation.',
+  title: 'AI‑Driven SEO | Kalki Technologies',
+  description: 'Programmatic SEO, on‑page & off‑page optimisation, local dominance. Guaranteed ROI. Free consultation.',
 };

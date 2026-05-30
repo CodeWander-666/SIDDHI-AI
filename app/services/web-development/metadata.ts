@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
-
 export const metadata: Metadata = {
-  title: 'Web Development | Kalki Technologies',
-  description: 'Ultra‑fast, Secure, Scalable. Guaranteed ROI. Free consultation.',
+  title: 'Website Development | Kalki Technologies',
+  description: 'Static (₹7,999) or Dynamic Next.js (₹12,999) – ultra‑fast, secure, SEO‑ready websites.',
 };

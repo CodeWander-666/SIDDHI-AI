@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /_next/
-Disallow: /node_modules/
-Disallow: /public/ki-market/data.json
-Disallow: /ki_cloud.db
-Disallow: /data/
-Sitemap: https://kalkicore.vercel.app/sitemap.xml
